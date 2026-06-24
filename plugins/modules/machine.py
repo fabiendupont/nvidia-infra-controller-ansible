@@ -10,21 +10,48 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.machine
+module: nvidia.infra_controller.machine
 short_description: Manage Machine resources
 description:
 - Machine is a physical server that contains CPUs, GPUs, memory, storage, and networking hardware. Machines are the physical
   building blocks of a Site.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   clear_instance_type:
     type: bool
     description:
     - Set to true to clear the existing Instance Type. Cannot be specified if Instance Type ID is specified. Can only be set
       by Provider.
+  health_issue:
+    type: dict
+    description:
+    - Required when `onlineRepair.enabled` is true. Must not be set when exiting online repair (`onlineRepair.enabled` false).
+    suboptions:
+      category:
+        type: str
+        description:
+        - category parameter.
+        required: true
+        choices:
+        - Hardware
+        - Network
+        - Performance
+        - Storage
+        - Software
+        - Other
+      details:
+        type: str
+        description:
+        - details parameter.
+        required: true
+      summary:
+        type: str
+        description:
+        - summary parameter.
+        required: true
   id:
     type: str
     description:
@@ -47,6 +74,29 @@ options:
     description:
     - Optional message describing the reason for moving Machine into maintenance mode. Can be updated by Provider or Privileged
       Tenant.
+  online_repair:
+    type: dict
+    description:
+    - 'Enable or disable online repair of a Machine. Online repair facilitates repairing a Machine without the Tenant having
+      to release the Machine by deleting the Instance. When `enabled` is true, `policy` and `acknowledgments` are required
+      inside this object,
+
+      and `healthIssue` is required at the top level of the MachineUpdateRequest. When `enabled` is false, none of those fields
+      may be set.'
+    suboptions:
+      acknowledgments:
+        type: dict
+        description:
+        - acknowledgments parameter.
+      enabled:
+        type: bool
+        description:
+        - enabled parameter.
+        required: true
+      policy:
+        type: dict
+        description:
+        - policy parameter.
   set_maintenance_mode:
     type: bool
     description:
@@ -72,7 +122,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Delete a Machine
-  nvidia.bare_metal.machine:
+  nvidia.infra_controller.machine:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -89,17 +139,33 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
 clear_instance_type=dict(type='bool'),
+health_issue=dict(type='dict', options=dict(
+    category=dict(type='str', required=True, choices=['Hardware', 'Network', 'Performance', 'Storage', 'Software', 'Other']),
+    details=dict(type='str', required=True),
+    summary=dict(type='str', required=True),
+)),
 id=dict(type='str'),
 instance_type_id=dict(type='str'),
 labels=dict(type='dict'),
 machine_id=dict(type='str'),
 maintenance_message=dict(type='str'),
+online_repair=dict(type='dict', options=dict(
+    acknowledgments=dict(type='dict', options=dict(
+        accept_data_corruption_risk=dict(type='bool', required=True),
+        accept_instance_deletion_risk=dict(type='bool', required=True),
+        accept_repair_team_access=dict(type='bool', required=True),
+    )),
+    enabled=dict(type='bool', required=True),
+    policy=dict(type='dict', options=dict(
+        allow_auto_instance_deletion_on_failure=dict(type='bool', required=True),
+    )),
+)),
 set_maintenance_mode=dict(type='bool'),
 state=dict(type='str', choices=['present', 'absent']),
 wait=dict(type='bool'),
@@ -107,12 +173,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/machine',
-    'resource_item_path': '/v2/org/{org}/carbide/machine/{machineId}',
+    'resource_path': '/v2/org/{org}/nico/machine-capability',
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}',
     'id_param': 'machineId',
     'name_field': None,
     'create_schema_fields': [],
-    'update_schema_fields': ['instance_type_id', 'clear_instance_type', 'set_maintenance_mode', 'maintenance_message', 'labels'],
+    'update_schema_fields': ['instance_type_id', 'clear_instance_type', 'set_maintenance_mode', 'maintenance_message', 'labels', 'online_repair', 'health_issue'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.expected_power_shelf_info
+module: nvidia.infra_controller.expected_power_shelf_info
 short_description: Retrieve Expected Power Shelf information
 description:
 - 'Expected Power Shelf identifies a Power Shelf that is expected to be discovered at a Site. Infrastructure Providers can
@@ -18,9 +18,9 @@ description:
 
   credentials and serial numbers to help with Power Shelf discovery and ingestion.'
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   expected_power_shelf_id:
     type: str
@@ -39,13 +39,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Expected Power Shelf resources
-  nvidia.bare_metal.expected_power_shelf_info:
+  nvidia.infra_controller.expected_power_shelf_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Expected Power Shelf by ID
-  nvidia.bare_metal.expected_power_shelf_info:
+  nvidia.infra_controller.expected_power_shelf_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -66,8 +66,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
@@ -77,8 +77,8 @@ site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/expected-power-shelf',
-    'resource_item_path': '/v2/org/{org}/carbide/expected-power-shelf/{expectedPowerShelfId}',
+    'resource_path': '/v2/org/{org}/nico/expected-power-shelf',
+    'resource_item_path': '/v2/org/{org}/nico/expected-power-shelf/{expectedPowerShelfId}',
     'id_param': 'expectedPowerShelfId',
     'filter_fields': ['site_id'],
 }

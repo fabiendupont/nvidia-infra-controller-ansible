@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'plugins'))
 
-from module_utils.client import BareMetalClient
+from module_utils.client import NicoClient
 
 
 def make_module(api_url='https://api.example.com', api_token='test-token', org='test-org', api_path_prefix=None):
@@ -24,71 +24,71 @@ def make_module(api_url='https://api.example.com', api_token='test-token', org='
     return module
 
 
-class TestBareMetalClientInit:
+class TestNicoClientInit:
     def test_url_stripping(self):
         module = make_module(api_url='https://api.example.com/')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         assert client.api_url == 'https://api.example.com'
 
     def test_org_stored(self):
         module = make_module(org='my-org')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         assert client.org == 'my-org'
 
 
-class TestBareMetalClientUrl:
+class TestNicoClientUrl:
     def test_url_building(self):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/org/{org}/carbide/vpc')
         assert url == 'https://api.example.com/v2/org/test-org/carbide/vpc'
 
     def test_url_no_org(self):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/health')
         assert url == 'https://api.example.com/v2/health'
 
     def test_url_forge_prefix(self):
         module = make_module(api_path_prefix='forge')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/org/{org}/carbide/vpc')
         assert url == 'https://api.example.com/v2/org/test-org/forge/vpc'
 
     def test_url_forge_prefix_with_item_path(self):
         module = make_module(api_path_prefix='forge')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/org/{org}/carbide/instance/type/{instanceTypeId}')
         assert url == 'https://api.example.com/v2/org/test-org/forge/instance/type/{instanceTypeId}'
 
     def test_url_default_prefix_unchanged(self):
         module = make_module(api_path_prefix='carbide')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/org/{org}/carbide/vpc')
         assert url == 'https://api.example.com/v2/org/test-org/carbide/vpc'
 
     def test_url_none_prefix_defaults_to_carbide(self):
         module = make_module(api_path_prefix=None)
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         url = client._url('/v2/org/{org}/carbide/vpc')
         assert url == 'https://api.example.com/v2/org/test-org/carbide/vpc'
 
 
-class TestBareMetalClientHeaders:
+class TestNicoClientHeaders:
     def test_headers(self):
         module = make_module(api_token='my-jwt-token')
-        client = BareMetalClient(module)
+        client = NicoClient(module)
         headers = client._headers()
         assert headers['Authorization'] == 'Bearer my-jwt-token'
         assert headers['Content-Type'] == 'application/json'
         assert headers['Accept'] == 'application/json'
 
 
-class TestBareMetalClientGet:
+class TestNicoClientGet:
     @patch('module_utils.client.open_url')
     def test_get_success(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         mock_resp = MagicMock()
         mock_resp.getcode.return_value = 200
@@ -101,7 +101,7 @@ class TestBareMetalClientGet:
     @patch('module_utils.client.open_url')
     def test_get_404(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         error = Exception('HTTP Error 404')
         error.code = 404
@@ -112,11 +112,11 @@ class TestBareMetalClientGet:
         assert result is None
 
 
-class TestBareMetalClientCreate:
+class TestNicoClientCreate:
     @patch('module_utils.client.open_url')
     def test_create(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         created = {'id': '456', 'name': 'new-vpc', 'status': 'Pending'}
         mock_resp = MagicMock()
@@ -134,11 +134,11 @@ class TestBareMetalClientCreate:
         assert body == {'name': 'new-vpc'}
 
 
-class TestBareMetalClientUpdate:
+class TestNicoClientUpdate:
     @patch('module_utils.client.open_url')
     def test_update(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         updated = {'id': '123', 'name': 'updated-vpc'}
         mock_resp = MagicMock()
@@ -150,11 +150,11 @@ class TestBareMetalClientUpdate:
         assert result == updated
 
 
-class TestBareMetalClientDelete:
+class TestNicoClientDelete:
     @patch('module_utils.client.open_url')
     def test_delete_204(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         mock_resp = MagicMock()
         mock_resp.getcode.return_value = 204
@@ -165,11 +165,11 @@ class TestBareMetalClientDelete:
         assert result is None
 
 
-class TestBareMetalClientListAll:
+class TestNicoClientListAll:
     @patch('module_utils.client.open_url')
     def test_single_page(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         items = [{'id': '1'}, {'id': '2'}]
         mock_resp = MagicMock()
@@ -185,7 +185,7 @@ class TestBareMetalClientListAll:
     @patch('module_utils.client.open_url')
     def test_multi_page(self, mock_open_url):
         module = make_module()
-        client = BareMetalClient(module)
+        client = NicoClient(module)
 
         page1 = [{'id': str(i)} for i in range(100)]
         page2 = [{'id': str(i)} for i in range(100, 150)]

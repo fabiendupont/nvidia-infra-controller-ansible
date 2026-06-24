@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.ip_block_info
+module: nvidia.infra_controller.ip_block_info
 short_description: Retrieve IP Block information
 description:
 - IP Block is a contiguous block of IP addresses defined by a prefix and prefix length.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -56,13 +56,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all IP Block resources
-  nvidia.bare_metal.ip_block_info:
+  nvidia.infra_controller.ip_block_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific IP Block by ID
-  nvidia.bare_metal.ip_block_info:
+  nvidia.infra_controller.ip_block_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -83,8 +83,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
@@ -99,10 +99,10 @@ tenant_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/ipblock',
-    'resource_item_path': '/v2/org/{org}/carbide/ipblock/{ipBlockId}',
+    'resource_path': '/v2/org/{org}/nico/ipblock/{ipBlockId}/derived',
+    'resource_item_path': '/v2/org/{org}/nico/ipblock/{ipBlockId}',
     'id_param': 'ipBlockId',
-    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'site_id', 'status', 'include_usage_stats', 'query'],
+    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'site_id', 'status', 'include_usage_stats', 'query', 'status', 'query'],
 }
 
 

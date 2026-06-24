@@ -10,8 +10,8 @@ from ansible.module_utils.six.moves.urllib.parse import quote as urlquote
 from ansible.module_utils.urls import open_url
 
 
-class BareMetalClient(object):
-    """HTTP client for the NVIDIA Bare Metal Manager REST API."""
+class NicoClient(object):
+    """HTTP client for the NVIDIA Infra Controller REST API."""
 
     def __init__(self, module):
         self.module = module

@@ -10,35 +10,31 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.instance_nvlink_interface_info
-short_description: Retrieve instance_nvlink_interface information
+module: nvidia.infra_controller.tenant_identity_info
+short_description: Retrieve Tenant Identity information
 description:
-- Retrieve instance_nvlink_interface information
+- Tenant identity (JWT-SVID issuance) and RFC 8693 token delegation.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
-  instance_id:
+  site_id:
     type: str
     description:
-    - 'ID path parameter: instance_id.'
-  status:
-    type: str
-    description:
-    - Filter NVLink Interfaces by Status. Can be specified multiple times to filter on more than one status.
+    - 'ID path parameter: site_id.'
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all instance_nvlink_interface resources
-  nvidia.bare_metal.instance_nvlink_interface_info:
+- name: List all Tenant Identity resources
+  nvidia.infra_controller.tenant_identity_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific instance_nvlink_interface by ID
-  nvidia.bare_metal.instance_nvlink_interface_info:
+- name: Get a specific Tenant Identity by ID
+  nvidia.infra_controller.tenant_identity_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -59,20 +55,19 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
-instance_id=dict(type='str'),
-status=dict(type='str'),
+site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/instance/{instanceId}/nvlink-interface',
+    'resource_path': '/v2/org/{org}/nico/site/{siteID}/.well-known/spiffe/jwks.json',
     'resource_item_path': '',
     'id_param': 'id',
-    'filter_fields': ['status'],
+    'filter_fields': [],
 }
 
 

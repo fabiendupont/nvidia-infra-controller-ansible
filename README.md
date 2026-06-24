@@ -1,7 +1,7 @@
-# NVIDIA Bare Metal Manager Ansible Collection
+# NVIDIA Infra Controller Ansible Collection
 
-`nvidia.bare_metal` is an Ansible collection for managing resources on the
-NVIDIA Bare Metal Manager REST API. All modules
+`nvidia.infra_controller` is an Ansible collection for managing resources on the
+NVIDIA Infra Controller (NICo) REST API. All modules
 are generated from the OpenAPI specification, keeping them in sync with the
 API surface.
 
@@ -9,22 +9,22 @@ API surface.
 
 - Ansible >= 2.14
 - Python >= 3.9
-- A JWT bearer token for the Bare Metal Manager API
+- A JWT bearer token for the Infra Controller API
 
 ## Installation
 
 ### From Git
 
 ```bash
-ansible-galaxy collection install git+https://github.com/fabiendupont/nvidia-bare-metal-manager-ansible.git
+ansible-galaxy collection install git+https://github.com/fabiendupont/nvidia-infra-controller-ansible.git
 ```
 
 ### From a local build
 
 ```bash
-cd bare-metal-manager-ansible
+cd nvidia-infra-controller-ansible
 ansible-galaxy collection build
-ansible-galaxy collection install nvidia-bare_metal-1.0.0.tar.gz
+ansible-galaxy collection install nvidia-infra_controller-2.0.0.tar.gz
 ```
 
 ## Authentication
@@ -34,17 +34,17 @@ can be set per-task, in `module_defaults`, or via environment variables.
 
 | Parameter | Environment Variable | Description |
 |---|---|---|
-| `api_url` | `NVIDIA_BMM_API_URL` | Base URL of the API (or the NVIDIA proxy) |
-| `api_token` | `NVIDIA_BMM_API_TOKEN` | JWT bearer token |
-| `org` | `NVIDIA_BMM_ORG` | Organization name |
-| `api_path_prefix` | `NVIDIA_BMM_API_PATH_PREFIX` | `carbide` (direct) or `forge` (proxy). Default: `carbide` |
+| `api_url` | `NVIDIA_NICO_API_URL` | Base URL of the API (or the NVIDIA proxy) |
+| `api_token` | `NVIDIA_NICO_API_TOKEN` | JWT bearer token |
+| `org` | `NVIDIA_NICO_ORG` | Organization name |
+| `api_path_prefix` | `NVIDIA_NICO_API_PATH_PREFIX` | `carbide` (direct) or `forge` (proxy). Default: `carbide` |
 
 ### Obtaining a token
 
 Exchange SSA credentials for a JWT:
 
 ```bash
-export NVIDIA_BMM_API_TOKEN=$(curl -s -X POST \
+export NVIDIA_NICO_API_TOKEN=$(curl -s -X POST \
   "$SSA_TOKEN_URL" \
   -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=client_credentials" \
   | jq -r '.access_token')
@@ -57,13 +57,13 @@ Set auth once for all tasks in a play:
 ```yaml
 - hosts: localhost
   module_defaults:
-    group/nvidia.bare_metal.all:
-      api_url: "{{ bmm_api_url }}"
-      api_token: "{{ bmm_api_token }}"
-      org: "{{ bmm_org }}"
+    group/nvidia.infra_controller.all:
+      api_url: "{{ nico_api_url }}"
+      api_token: "{{ nico_api_token }}"
+      org: "{{ nico_org }}"
       api_path_prefix: forge
   tasks:
-    - nvidia.bare_metal.vpc:
+    - nvidia.infra_controller.vpc:
         state: present
         name: my-vpc
         site_id: "{{ site_id }}"
@@ -77,7 +77,7 @@ Set auth once for all tasks in a play:
 - hosts: localhost
   tasks:
     - name: Create VPC
-      nvidia.bare_metal.vpc:
+      nvidia.infra_controller.vpc:
         state: present
         name: lab-vpc
         site_id: "{{ site_id }}"
@@ -85,7 +85,7 @@ Set auth once for all tasks in a play:
       register: vpc
 
     - name: Create VPC prefix
-      nvidia.bare_metal.vpc_prefix:
+      nvidia.infra_controller.vpc_prefix:
         state: present
         name: lab-prefix
         vpc_id: "{{ vpc.resource.id }}"
@@ -94,7 +94,7 @@ Set auth once for all tasks in a play:
       register: prefix
 
     - name: Create instance
-      nvidia.bare_metal.instance:
+      nvidia.infra_controller.instance:
         state: present
         name: gpu-worker-01
         tenant_id: "{{ tenant_id }}"
@@ -115,12 +115,12 @@ Set auth once for all tasks in a play:
 
 ```yaml
 - name: Get all VPCs at a site
-  nvidia.bare_metal.vpc_info:
+  nvidia.infra_controller.vpc_info:
     site_id: "{{ site_id }}"
   register: vpcs
 
 - name: Get a specific instance by ID
-  nvidia.bare_metal.instance_info:
+  nvidia.infra_controller.instance_info:
     id: "{{ instance_id }}"
   register: inst
 ```
@@ -129,12 +129,12 @@ Set auth once for all tasks in a play:
 
 ```yaml
 - name: Delete an instance
-  nvidia.bare_metal.instance:
+  nvidia.infra_controller.instance:
     state: absent
     name: gpu-worker-01
 
 - name: Delete a VPC
-  nvidia.bare_metal.vpc:
+  nvidia.infra_controller.vpc:
     state: absent
     name: lab-vpc
     site_id: "{{ site_id }}"
@@ -144,7 +144,7 @@ Set auth once for all tasks in a play:
 
 ```yaml
 - name: Create 4 topology-optimized instances
-  nvidia.bare_metal.instance_batch:
+  nvidia.infra_controller.instance_batch:
     name_prefix: gpu-worker
     count: 4
     tenant_id: "{{ tenant_id }}"
@@ -159,15 +159,15 @@ Set auth once for all tasks in a play:
 
 ## Dynamic inventory
 
-The `nvidia.bare_metal.bmm` inventory plugin discovers instances from the
+The `nvidia.infra_controller.nico` inventory plugin discovers instances from the
 API and builds the Ansible inventory at runtime.
 
-Create a file ending in `.bmm.yml`:
+Create a file ending in `.nico.yml`:
 
 ```yaml
-# inventory/bmm.bmm.yml
-plugin: nvidia.bare_metal.bmm
-api_url: https://bmm-api.example.com
+# inventory/nico.nico.yml
+plugin: nvidia.infra_controller.nico
+api_url: https://nico-api.example.com
 api_path_prefix: forge  # or 'carbide' for direct API access
 
 filters:
@@ -186,14 +186,14 @@ compose:
   ansible_user: "'root'"
 
 groups:
-  gpu_nodes: bmm_labels.get('role') == 'compute'
+  gpu_nodes: nico_labels.get('role') == 'compute'
 ```
 
 Then use it like any inventory source:
 
 ```bash
-ansible-inventory -i inventory/bmm.bmm.yml --list
-ansible-playbook -i inventory/bmm.bmm.yml playbook.yml
+ansible-inventory -i inventory/nico.nico.yml --list
+ansible-playbook -i inventory/nico.nico.yml playbook.yml
 ```
 
 ### Inventory host variables
@@ -203,23 +203,23 @@ Each discovered host gets the following variables:
 | Variable | Description |
 |---|---|
 | `ansible_host` | First IP address from the instance's interfaces |
-| `bmm` | Full instance dict (all fields, snake_case keys) |
-| `bmm_id` | Instance ID |
-| `bmm_site_id` | Site ID |
-| `bmm_vpc_id` | VPC ID |
-| `bmm_instance_type_id` | Instance Type ID |
-| `bmm_machine_id` | Machine ID |
-| `bmm_status` | Instance status |
-| `bmm_labels` | Instance labels dict |
+| `nico` | Full instance dict (all fields, snake_case keys) |
+| `nico_id` | Instance ID |
+| `nico_site_id` | Site ID |
+| `nico_vpc_id` | VPC ID |
+| `nico_instance_type_id` | Instance Type ID |
+| `nico_machine_id` | Machine ID |
+| `nico_status` | Instance status |
+| `nico_labels` | Instance labels dict |
 
 ### Auto-grouping
 
 Groups are created from instance fields and labels:
 
-- `bmm_site_id_<id>` -- one group per site
-- `bmm_vpc_id_<id>` -- one group per VPC
-- `bmm_status_Ready` -- one group per status value
-- `bmm_label_<key>_<value>` -- one group per label key-value pair
+- `nico_site_id_<id>` -- one group per site
+- `nico_vpc_id_<id>` -- one group per VPC
+- `nico_status_Ready` -- one group per status value
+- `nico_label_<key>_<value>` -- one group per label key-value pair
 
 ## Modules
 
@@ -234,6 +234,9 @@ All support `check_mode`, `wait`, and `wait_timeout`.
 | `allocation_constraint` | Allocation Constraint (nested under allocation) |
 | `dpu_extension_service` | DPU Extension Service |
 | `expected_machine` | Expected Machine |
+| `expected_power_shelf` | Expected Power Shelf |
+| `expected_rack` | Expected Rack |
+| `expected_switch` | Expected Switch |
 | `infiniband_partition` | InfiniBand Partition |
 | `instance` | Instance |
 | `instance_type` | Instance Type |
@@ -246,8 +249,10 @@ All support `check_mode`, `wait`, and `wait_timeout`.
 | `ssh_key` | SSH Key |
 | `ssh_key_group` | SSH Key Group |
 | `subnet` | Subnet |
+| `task` | Task |
 | `tenant_account` | Tenant Account |
 | `vpc` | VPC |
+| `vpc_peering` | VPC Peering |
 | `vpc_prefix` | VPC Prefix |
 
 ### Info modules
@@ -261,9 +266,13 @@ Retrieve resources. Return `resource` (single) or `resources` (list).
 | `audit_info` | Audit log entries |
 | `dpu_extension_service_info` | DPU Extension Service |
 | `expected_machine_info` | Expected Machine |
+| `expected_power_shelf_info` | Expected Power Shelf |
+| `expected_rack_info` | Expected Rack |
+| `expected_switch_info` | Expected Switch |
 | `infiniband_partition_info` | InfiniBand Partition |
 | `infrastructure_provider_info` | Infrastructure Provider |
 | `instance_info` | Instance |
+| `instance_nvlink_interface_info` | Instance NVLink Interface |
 | `instance_type_info` | Instance Type |
 | `ip_block_info` | IP Block |
 | `machine_capability_info` | Machine Capability |
@@ -273,16 +282,21 @@ Retrieve resources. Return `resource` (single) or `resources` (list).
 | `nvlink_logical_partition_info` | NVLink Logical Partition |
 | `operating_system_info` | Operating System |
 | `rack_info` | Rack |
+| `rack_task_info` | Rack Task |
 | `service_account_info` | Service Account |
 | `site_info` | Site |
 | `sku_info` | SKU |
 | `ssh_key_group_info` | SSH Key Group |
 | `ssh_key_info` | SSH Key |
 | `subnet_info` | Subnet |
+| `task_info` | Task |
 | `tenant_account_info` | Tenant Account |
+| `tenant_identity_info` | Tenant Identity |
 | `tenant_info` | Tenant |
+| `tray_info` | Tray |
 | `user_info` | User |
 | `vpc_info` | VPC |
+| `vpc_peering_info` | VPC Peering |
 | `vpc_prefix_info` | VPC Prefix |
 
 ### Batch modules
@@ -290,6 +304,18 @@ Retrieve resources. Return `resource` (single) or `resources` (list).
 | Module | Description |
 |---|---|
 | `instance_batch` | Batch-create multiple instances with topology-optimized allocation |
+
+### Action modules
+
+| Module | Description |
+|---|---|
+| `rack_bringup` | Rack bringup action |
+| `rack_validation` | Rack validation check |
+| `rack_power` | Rack power control |
+| `rack_firmware` | Rack firmware update |
+| `tray_validation` | Tray validation check |
+| `tray_power` | Tray power control |
+| `tray_firmware` | Tray firmware update |
 
 ## Idempotency
 
@@ -314,7 +340,7 @@ complete. The resource is polled until its `status` reaches a ready state or an
 error state.
 
 ```yaml
-- nvidia.bare_metal.instance:
+- nvidia.infra_controller.instance:
     state: present
     name: my-instance
     # ...
@@ -342,8 +368,9 @@ make test
 make lint
 ```
 
-The generator reads `bare-metal-manager-rest/openapi/spec.yaml`, resolves
-`$ref` references, groups operations by tag, and produces one Python file
+The generator reads the OpenAPI spec from the upstream
+[NVIDIA/infra-controller](https://github.com/NVIDIA/infra-controller) repository,
+resolves `$ref` references, groups operations by tag, and produces one Python file
 per resource. Hand-written code lives in `plugins/module_utils/` and is
 not regenerated.
 

@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.site_info
+module: nvidia.infra_controller.site_info
 short_description: Retrieve Site information
 description:
 - Site is a datacenter that contains physical hardware and networking resources. All resources created by Provider or Tenant
   are directly or indirectly anchored to the Site object.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -32,6 +32,10 @@ options:
     type: str
     description:
     - Filter Sites by Infrastructure Provider ID
+  is_flow_enabled:
+    type: bool
+    description:
+    - Filter Sites by NICo Flow enabled flag. Requires Provider Admin role.
   is_native_networking_enabled:
     type: bool
     description:
@@ -44,10 +48,6 @@ options:
     type: bool
     description:
     - Filter Sites by NVLink partitioning enabled flag. Requires Provider Admin role.
-  is_rack_level_administration_enabled:
-    type: bool
-    description:
-    - Filter Sites by Rack Level Administration enabled flag. Requires Provider Admin role.
   query:
     type: str
     description:
@@ -70,13 +70,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Site resources
-  nvidia.bare_metal.site_info:
+  nvidia.infra_controller.site_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Site by ID
-  nvidia.bare_metal.site_info:
+  nvidia.infra_controller.site_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -97,18 +97,18 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
 include_machine_stats=dict(type='bool'),
 infrastructure_provider_id=dict(type='str'),
+is_flow_enabled=dict(type='bool'),
 is_native_networking_enabled=dict(type='bool'),
 is_network_security_group_enabled=dict(type='bool'),
 is_nv_link_partition_enabled=dict(type='bool'),
-is_rack_level_administration_enabled=dict(type='bool'),
 query=dict(type='str'),
 site_id=dict(type='str'),
 status=dict(type='str'),
@@ -116,10 +116,10 @@ tenant_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/site',
-    'resource_item_path': '/v2/org/{org}/carbide/site/{siteId}',
+    'resource_path': '/v2/org/{org}/nico/site/{siteId}/status-history',
+    'resource_item_path': '/v2/org/{org}/nico/site/{siteId}',
     'id_param': 'siteId',
-    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'status', 'is_native_networking_enabled', 'is_network_security_group_enabled', 'is_nv_link_partition_enabled', 'is_rack_level_administration_enabled', 'include_machine_stats', 'query'],
+    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'status', 'is_native_networking_enabled', 'is_network_security_group_enabled', 'is_nv_link_partition_enabled', 'is_flow_enabled', 'include_machine_stats', 'query'],
 }
 
 

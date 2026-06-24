@@ -10,20 +10,27 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.instance_batch
+module: nvidia.infra_controller.instance_batch
 short_description: Batch create Instance resources
 description:
 - Batch create Instance
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   always_boot_with_custom_ipxe:
     type: bool
     description:
     - When set to true, the iPXE script specified by OS or overridden here will always be run when rebooting the Instances.
       OS must be of iPXE type.
+  auto_network:
+    type: bool
+    description:
+    - 'When true, asks NICo to auto-resolve each Instance''s network interfaces from the host''s underlay (HostInband) network
+      segments. Intended for instances on zero-DPU hosts (or hosts with their DPU in NIC mode). When true: (1) the target
+      VPC''s `networkVirtualizationType` MUST be `FLAT`, (2) `interfaces` MUST be empty or omitted, and (3) `secondaryVpcIds`
+      MUST be empty or omitted.'
   count:
     type: int
     description:
@@ -85,10 +92,10 @@ options:
   interfaces:
     type: list
     description:
-    - Interface configuration shared across all instances. At least one interface must be specified. Either Subnet or VPC
-      Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over Physical interface. Interface
-      `ipAddress` is not supported for batch instance creation requests.
-    required: true
+    - 'Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork`
+      is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over
+      Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive
+      with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.'
     elements: dict
     suboptions:
       device:
@@ -99,6 +106,10 @@ options:
         type: int
         description:
         - device_instance parameter.
+      inline_routing_profile:
+        type: str
+        description:
+        - inline_routing_profile parameter.
       ip_address:
         type: str
         description:
@@ -197,7 +208,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Batch create Instance resources
-  nvidia.bare_metal.instance_batch:
+  nvidia.infra_controller.instance_batch:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -213,12 +224,13 @@ resources:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import BatchResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import BatchResource
 
 
 ARGUMENT_SPEC = dict(
 always_boot_with_custom_ipxe=dict(type='bool'),
+auto_network=dict(type='bool'),
 count=dict(type='int', required=True),
 description=dict(type='str'),
 dpu_extension_service_deployments=dict(type='list', elements='dict', options=dict(
@@ -234,9 +246,10 @@ infiniband_interfaces=dict(type='list', elements='dict', options=dict(
     virtual_function_id=dict(type='int'),
 )),
 instance_type_id=dict(type='str', required=True),
-interfaces=dict(type='list', required=True, elements='dict', options=dict(
+interfaces=dict(type='list', elements='dict', options=dict(
     device=dict(type='str'),
     device_instance=dict(type='int'),
+    inline_routing_profile=dict(type='str'),
     ip_address=dict(type='str'),
     is_physical=dict(type='bool'),
     subnet_id=dict(type='str'),
@@ -263,7 +276,7 @@ vpc_id=dict(type='str', required=True),
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/instance/batch',
-    'create_schema_fields': ['name_prefix', 'count', 'description', 'tenant_id', 'instance_type_id', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'infiniband_interfaces', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'topology_optimized'],
+    'create_schema_fields': ['name_prefix', 'count', 'description', 'tenant_id', 'instance_type_id', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'auto_network', 'infiniband_interfaces', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'topology_optimized'],
 }
 
 

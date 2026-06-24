@@ -10,15 +10,19 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.allocation_info
+module: nvidia.infra_controller.allocation_info
 short_description: Retrieve Allocation information
 description:
 - Allocations are the mechanism by which Provider can delegate Network and Compute resources to Tenant.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  allocation_constraint_id:
+    type: str
+    description:
+    - 'ID path parameter: allocation_constraint_id.'
   allocation_id:
     type: str
     description:
@@ -77,13 +81,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Allocation resources
-  nvidia.bare_metal.allocation_info:
+  nvidia.infra_controller.allocation_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Allocation by ID
-  nvidia.bare_metal.allocation_info:
+  nvidia.infra_controller.allocation_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -104,11 +108,12 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
+allocation_constraint_id=dict(type='str'),
 allocation_id=dict(type='str'),
 constraint_type=dict(type='str', choices=['Reserved', 'OnDemand', 'Preemptible']),
 constraint_value=dict(type='int'),
@@ -123,9 +128,9 @@ tenant_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/allocation',
-    'resource_item_path': '/v2/org/{org}/carbide/allocation/{allocationId}',
-    'id_param': 'allocationId',
+    'resource_path': '/v2/org/{org}/nico/allocation',
+    'resource_item_path': '/v2/org/{org}/nico/allocation/{allocationId}/constraint/{allocationConstraintId}',
+    'id_param': 'allocationConstraintId',
     'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'site_id', 'id', 'resource_type', 'status', 'resource_type_id', 'constraint_type', 'constraint_value', 'query'],
 }
 

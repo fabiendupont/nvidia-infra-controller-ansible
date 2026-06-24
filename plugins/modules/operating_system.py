@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.operating_system
+module: nvidia.infra_controller.operating_system
 short_description: Manage Operating System resources
 description:
 - Operating Systems in NICo are typically iPXE scripts that are used to boot Machines.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   allow_override:
     type: bool
@@ -125,7 +125,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Operating System
-  nvidia.bare_metal.operating_system:
+  nvidia.infra_controller.operating_system:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -133,7 +133,7 @@ EXAMPLES = r'''
     name: "my-operating-system"
 
 - name: Delete a Operating System
-  nvidia.bare_metal.operating_system:
+  nvidia.infra_controller.operating_system:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -150,8 +150,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -182,8 +182,8 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/operating-system',
-    'resource_item_path': '/v2/org/{org}/carbide/operating-system/{operatingSystemId}',
+    'resource_path': '/v2/org/{org}/nico/operating-system',
+    'resource_item_path': '/v2/org/{org}/nico/operating-system/{operatingSystemId}',
     'id_param': 'operatingSystemId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'description', 'infrastructure_provider_id', 'tenant_id', 'site_ids', 'ipxe_script', 'image_url', 'image_sha', 'image_auth_type', 'image_auth_token', 'image_disk', 'root_fs_id', 'root_fs_label', 'phone_home_enabled', 'user_data', 'is_cloud_init', 'allow_override'],

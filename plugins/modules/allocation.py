@@ -10,15 +10,19 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.allocation
+module: nvidia.infra_controller.allocation
 short_description: Manage Allocation resources
 description:
 - Allocations are the mechanism by which Provider can delegate Network and Compute resources to Tenant.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  allocation_constraint_id:
+    type: str
+    description:
+    - 'ID path parameter: allocation_constraint_id.'
   allocation_constraints:
     type: list
     description:
@@ -56,6 +60,11 @@ options:
     type: str
     description:
     - 'ID path parameter: allocation_id.'
+  constraint_value:
+    type: int
+    description:
+    - Value of the Allocation Constraint. For InstanceType, this value represents number of Machines allocated for Tenant.
+      For IPBlock, this value represents the prefix Length of the IP Block.
   description:
     type: str
     description:
@@ -96,7 +105,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Allocation
-  nvidia.bare_metal.allocation:
+  nvidia.infra_controller.allocation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -104,7 +113,7 @@ EXAMPLES = r'''
     name: "my-allocation"
 
 - name: Delete a Allocation
-  nvidia.bare_metal.allocation:
+  nvidia.infra_controller.allocation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -121,11 +130,12 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
+allocation_constraint_id=dict(type='str'),
 allocation_constraints=dict(type='list', elements='dict', options=dict(
     constraint_type=dict(type='str', required=True, choices=['Reserved', 'OnDemand', 'Preemptible']),
     constraint_value=dict(type='int', required=True),
@@ -133,6 +143,7 @@ allocation_constraints=dict(type='list', elements='dict', options=dict(
     resource_type_id=dict(type='str', required=True),
 )),
 allocation_id=dict(type='str'),
+constraint_value=dict(type='int'),
 description=dict(type='str'),
 id=dict(type='str'),
 name=dict(type='str'),
@@ -144,12 +155,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/allocation',
-    'resource_item_path': '/v2/org/{org}/carbide/allocation/{allocationId}',
-    'id_param': 'allocationId',
+    'resource_path': '/v2/org/{org}/nico/allocation',
+    'resource_item_path': '/v2/org/{org}/nico/allocation/{allocationId}/constraint/{allocationConstraintId}',
+    'id_param': 'allocationConstraintId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'description', 'tenant_id', 'site_id', 'allocation_constraints'],
-    'update_schema_fields': ['name', 'description'],
+    'update_schema_fields': ['constraint_value'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

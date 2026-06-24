@@ -50,7 +50,7 @@ VPC_CONFIG = {
 
 
 class TestCrudResourceFindExisting:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_find_by_id(self, MockClient):
         module = make_module(id='vpc-123')
         client = MockClient.return_value
@@ -65,7 +65,7 @@ class TestCrudResourceFindExisting:
         assert 'vpc-123' in get_path
         assert '{vpcId}' not in get_path
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_find_by_name(self, MockClient):
         module = make_module(name='my-vpc', site_id='site-1')
         client = MockClient.return_value
@@ -80,7 +80,7 @@ class TestCrudResourceFindExisting:
         assert result is not None
         assert result['id'] == 'vpc-2'
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_find_by_name_not_found(self, MockClient):
         module = make_module(name='nonexistent', site_id='site-1')
         client = MockClient.return_value
@@ -93,7 +93,7 @@ class TestCrudResourceFindExisting:
 
         assert result is None
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_find_ambiguous_fails(self, MockClient):
         module = make_module(name='dup-vpc')
         client = MockClient.return_value
@@ -110,7 +110,7 @@ class TestCrudResourceFindExisting:
 
 
 class TestCrudResourcePresent:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_create_new(self, MockClient):
         module = make_module(
             name='new-vpc', description='A VPC', site_id='site-1',
@@ -128,7 +128,7 @@ class TestCrudResourcePresent:
         assert call_kwargs['changed'] is True
         assert call_kwargs['resource']['name'] == 'new-vpc'
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_update_existing_with_changes(self, MockClient):
         module = make_module(
             name='my-vpc', description='Updated desc',
@@ -146,7 +146,7 @@ class TestCrudResourcePresent:
         module.exit_json.assert_called_once()
         assert module.exit_json.call_args[1]['changed'] is True
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_no_change(self, MockClient):
         module = make_module(
             name='my-vpc', description='Same desc',
@@ -163,7 +163,7 @@ class TestCrudResourcePresent:
         module.exit_json.assert_called_once()
         assert module.exit_json.call_args[1]['changed'] is False
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_check_mode_create(self, MockClient):
         module = make_module(name='new-vpc', site_id='site-1')
         module.check_mode = True
@@ -195,7 +195,7 @@ class TestCrudResourceIdempotence:
         'delete_body_fields': [],
     }
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_no_change_with_nested_interfaces(self, MockClient):
         """When interfaces match, should report changed=False."""
         module = make_module(
@@ -216,7 +216,7 @@ class TestCrudResourceIdempotence:
         client.update.assert_not_called()
         assert module.exit_json.call_args[1]['changed'] is False
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_change_detected_in_nested_interfaces(self, MockClient):
         """When interfaces differ, should detect the change and update."""
         module = make_module(
@@ -247,7 +247,7 @@ class TestCrudResourceIdempotence:
         assert update_payload['interfaces'][0].get('subnetId') == 'sub-2'
         assert update_payload['interfaces'][0].get('isPhysical') is False
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_no_change_with_labels(self, MockClient):
         """Labels should compare without key conversion."""
         module = make_module(
@@ -268,7 +268,7 @@ class TestCrudResourceIdempotence:
         client.update.assert_not_called()
         assert module.exit_json.call_args[1]['changed'] is False
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_label_change_detected(self, MockClient):
         """A label value change should trigger an update."""
         module = make_module(
@@ -295,7 +295,7 @@ class TestCrudResourceIdempotence:
         update_payload = client.update.call_args[0][1]
         assert update_payload['labels'] == {'env': 'staging'}
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_create_converts_nested_keys_to_camel(self, MockClient):
         """Create payload should have camelCase keys at all nesting levels."""
         module = make_module(
@@ -321,7 +321,7 @@ class TestCrudResourceIdempotence:
 
 
 class TestCrudResourceAbsent:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_delete_existing(self, MockClient):
         module = make_module(state='absent', name='my-vpc')
         client = MockClient.return_value
@@ -339,7 +339,7 @@ class TestCrudResourceAbsent:
         module.exit_json.assert_called_once()
         assert module.exit_json.call_args[1]['changed'] is True
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_already_absent(self, MockClient):
         module = make_module(state='absent', name='nonexistent')
         client = MockClient.return_value
@@ -354,7 +354,7 @@ class TestCrudResourceAbsent:
 
 
 class TestCrudResourceNoCreate:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_no_create_fails(self, MockClient):
         config = dict(VPC_CONFIG)
         config['no_create'] = True
@@ -371,7 +371,7 @@ class TestCrudResourceNoCreate:
 
 
 class TestInfoResource:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_get_by_id(self, MockClient):
         config = {
             'resource_path': '/v2/org/{org}/carbide/vpc',
@@ -392,7 +392,7 @@ class TestInfoResource:
         assert call_kwargs['resource']['name'] == 'my-vpc'
         assert call_kwargs['resource']['site_id'] == 'site-1'
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_list_all(self, MockClient):
         config = {
             'resource_path': '/v2/org/{org}/carbide/vpc',
@@ -417,7 +417,7 @@ class TestInfoResource:
         # Keys should be snake_case
         assert call_kwargs['resources'][0]['site_id'] == 'site-1'
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_get_not_found(self, MockClient):
         config = {
             'resource_path': '/v2/org/{org}/carbide/vpc',
@@ -436,7 +436,7 @@ class TestInfoResource:
 
 
 class TestBatchResource:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_batch_create(self, MockClient):
         config = {
             'resource_path': '/v2/org/{org}/carbide/instance/batch',
@@ -461,7 +461,7 @@ class TestBatchResource:
         assert call_kwargs['changed'] is True
         assert len(call_kwargs['resources']) == 2
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_batch_check_mode(self, MockClient):
         config = {
             'resource_path': '/v2/org/{org}/carbide/instance/batch',
@@ -516,7 +516,7 @@ class TestResolvePath:
 
 
 class TestWaitDefaults:
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_wait_defaults_to_true_when_none(self, MockClient):
         """When wait param is None (not specified), should default to True."""
         module = make_module(state='absent', name='my-vpc', wait=None, wait_timeout=None)
@@ -535,7 +535,7 @@ class TestWaitDefaults:
         # wait_for_deleted was called (get was called to poll)
         client.get.assert_called()
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_wait_false_skips_polling(self, MockClient):
         """When wait=False, should not poll for deletion."""
         module = make_module(state='absent', name='my-vpc', wait=False)
@@ -568,7 +568,7 @@ class TestNestedResourcePaths:
         'delete_body_fields': [],
     }
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_find_by_id_resolves_parent_path(self, MockClient):
         module = make_module(id='const-1', allocation_id='alloc-1')
         client = MockClient.return_value
@@ -582,7 +582,7 @@ class TestNestedResourcePaths:
         assert 'alloc-1' in get_path
         assert '{allocationId}' not in get_path
 
-    @patch('module_utils.resource.BareMetalClient')
+    @patch('module_utils.resource.NicoClient')
     def test_list_resolves_parent_path(self, MockClient):
         module = make_module(name='my-constraint', allocation_id='alloc-1')
         client = MockClient.return_value

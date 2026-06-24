@@ -10,28 +10,28 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.machine_capability_info
+module: nvidia.infra_controller.machine_capability_info
 short_description: Retrieve Machine Capability information
 description:
 - Machine Capability defines the hardware capabilities of a Machine. Machine Capabilities can be used to group Machines into
   Instance Types.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options: {}
 '''
 
 EXAMPLES = r'''
 ---
 - name: List all Machine Capability resources
-  nvidia.bare_metal.machine_capability_info:
+  nvidia.infra_controller.machine_capability_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Machine Capability by ID
-  nvidia.bare_metal.machine_capability_info:
+  nvidia.infra_controller.machine_capability_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -52,8 +52,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(

@@ -2,10 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Fabien Dupont
 # SPDX-License-Identifier: Apache-2.0
 
-"""Generate Ansible modules from the NVIDIA Bare Metal Manager OpenAPI spec.
+"""Generate Ansible modules from the NVIDIA Infra Controller OpenAPI spec.
 
 Usage:
-    python scripts/generate.py --spec ../bare-metal-manager-rest/openapi/spec.yaml --output plugins/modules
+    python scripts/generate.py --spec .spec/spec.yaml --output plugins/modules
 """
 
 from __future__ import absolute_import, division, print_function
@@ -515,15 +515,15 @@ def generate_doc_string(module_name, tag, description, arg_spec, is_info=False, 
     if is_batch:
         short_desc = 'Batch create %s resources' % tag
 
-    full_module_name = 'nvidia.bare_metal.%s' % module_name
+    full_module_name = 'nvidia.infra_controller.%s' % module_name
 
     doc = {
         'module': full_module_name,
         'short_description': short_desc,
         'description': [description or short_desc],
         'version_added': '1.0.0',
-        'author': 'NVIDIA Bare Metal Manager Dev Team',
-        'extends_documentation_fragment': ['nvidia.bare_metal.auth'],
+        'author': 'Fabien Dupont',
+        'extends_documentation_fragment': ['nvidia.infra_controller.auth'],
         'options': {},
     }
 
@@ -565,7 +565,7 @@ def generate_doc_string(module_name, tag, description, arg_spec, is_info=False, 
 def generate_examples(module_name, tag, is_info=False, is_batch=False, has_create=True):
     """Generate EXAMPLES string."""
     lines = []
-    full_name = 'nvidia.bare_metal.%s' % module_name
+    full_name = 'nvidia.infra_controller.%s' % module_name
 
     if is_info:
         lines.append('- name: List all %s resources' % tag)
@@ -791,8 +791,8 @@ RETURN = r\'\'\'
 \'\'\'
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = %s
@@ -894,8 +894,8 @@ RETURN = r\'\'\'
 \'\'\'
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = %s
@@ -968,8 +968,8 @@ RETURN = r\'\'\'
 \'\'\'
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import BatchResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import BatchResource
 
 
 ARGUMENT_SPEC = %s
@@ -1069,7 +1069,7 @@ def generate_action_module(module_name, action_config, spec):
             returned: always''')
 
     # Generate examples
-    full_name = 'nvidia.bare_metal.%s' % module_name
+    full_name = 'nvidia.infra_controller.%s' % module_name
     examples_lines = []
     examples_lines.append('- name: Run %s on all %s resources' % (action_type, tag.lower()))
     examples_lines.append('  %s:' % full_name)
@@ -1113,8 +1113,8 @@ RETURN = r\'\'\'
 \'\'\'
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import ActionResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import ActionResource
 
 
 ARGUMENT_SPEC = %s

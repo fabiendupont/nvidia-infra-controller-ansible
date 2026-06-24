@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.vpc
+module: nvidia.infra_controller.vpc
 short_description: Manage VPC resources
 description:
 - VPC defines the networking isolation boundary for Tenant's Instances.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   description:
     type: str
@@ -43,10 +43,12 @@ options:
     type: str
     description:
     - Network virtualization type of the VPC. If no value is specified, then defaults to `FNN` if Site has native networking
-      enabled, or ETHERNET_VIRTUALIZER if native networking is disabled
+      enabled, or `ETHERNET_VIRTUALIZER` if native networking is disabled. Flat VPCs hold instances on zero-DPU hosts (or
+      hosts with their DPU in NIC mode) and are never auto-selected -- `FLAT` must be specified explicitly.
     choices:
     - ETHERNET_VIRTUALIZER
     - FNN
+    - FLAT
   nv_link_logical_partition_id:
     type: str
     description:
@@ -89,7 +91,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a VPC
-  nvidia.bare_metal.vpc:
+  nvidia.infra_controller.vpc:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -97,7 +99,7 @@ EXAMPLES = r'''
     name: "my-vpc"
 
 - name: Delete a VPC
-  nvidia.bare_metal.vpc:
+  nvidia.infra_controller.vpc:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -114,8 +116,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -124,7 +126,7 @@ id=dict(type='str'),
 labels=dict(type='dict'),
 name=dict(type='str'),
 network_security_group_id=dict(type='str'),
-network_virtualization_type=dict(type='str', choices=['ETHERNET_VIRTUALIZER', 'FNN']),
+network_virtualization_type=dict(type='str', choices=['ETHERNET_VIRTUALIZER', 'FNN', 'FLAT']),
 nv_link_logical_partition_id=dict(type='str'),
 routing_profile=dict(type='str'),
 site_id=dict(type='str'),
@@ -136,8 +138,8 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/vpc',
-    'resource_item_path': '/v2/org/{org}/carbide/vpc/{vpcId}',
+    'resource_path': '/v2/org/{org}/nico/vpc/{vpcId}/virtualization',
+    'resource_item_path': '/v2/org/{org}/nico/vpc/{vpcId}',
     'id_param': 'vpcId',
     'name_field': 'name',
     'create_schema_fields': ['id', 'name', 'description', 'site_id', 'network_virtualization_type', 'routing_profile', 'network_security_group_id', 'vni', 'nv_link_logical_partition_id', 'labels'],

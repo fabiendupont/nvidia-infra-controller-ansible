@@ -10,20 +10,27 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.subnet_info
+module: nvidia.infra_controller.subnet_info
 short_description: Retrieve Subnet information
 description:
 - Subnet is a network prefix belonging to an IP Block allocated to a Tenant. Tenant can use Subnets to enable network connectivity
   between their Instances.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
     description:
     - ID of the resource to retrieve.
+  include_usage_stats:
+    type: bool
+    description:
+    - 'When true, each Subnet object includes usage statistic using the same structure as IP Block usage.
+
+      Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a Subnets
+      consumes a single IP. In addition, 1 gateway and 1 broadcast IP address is reserved per Subnet.'
   query:
     type: str
     description:
@@ -49,13 +56,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Subnet resources
-  nvidia.bare_metal.subnet_info:
+  nvidia.infra_controller.subnet_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Subnet by ID
-  nvidia.bare_metal.subnet_info:
+  nvidia.infra_controller.subnet_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -76,12 +83,13 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
+include_usage_stats=dict(type='bool'),
 query=dict(type='str'),
 site_id=dict(type='str'),
 status=dict(type='str'),
@@ -90,10 +98,10 @@ vpc_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/subnet',
-    'resource_item_path': '/v2/org/{org}/carbide/subnet/{subnetId}',
+    'resource_path': '/v2/org/{org}/nico/subnet',
+    'resource_item_path': '/v2/org/{org}/nico/subnet/{subnetId}',
     'id_param': 'subnetId',
-    'filter_fields': ['site_id', 'vpc_id', 'status', 'query'],
+    'filter_fields': ['site_id', 'vpc_id', 'status', 'query', 'include_usage_stats'],
 }
 
 

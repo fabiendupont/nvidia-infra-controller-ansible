@@ -58,22 +58,22 @@ def get_auth_argument_spec():
         api_url=dict(
             type='str',
             required=True,
-            fallback=(env_fallback, ['NVIDIA_BMM_API_URL']),
+            fallback=(env_fallback, ['NVIDIA_NICO_API_URL']),
         ),
         api_token=dict(
             type='str',
             required=True,
             no_log=True,
-            fallback=(env_fallback, ['NVIDIA_BMM_API_TOKEN']),
+            fallback=(env_fallback, ['NVIDIA_NICO_API_TOKEN']),
         ),
         org=dict(
             type='str',
             required=True,
-            fallback=(env_fallback, ['NVIDIA_BMM_ORG']),
+            fallback=(env_fallback, ['NVIDIA_NICO_ORG']),
         ),
         api_path_prefix=dict(
             type='str',
             default='carbide',
-            fallback=(env_fallback, ['NVIDIA_BMM_API_PATH_PREFIX']),
+            fallback=(env_fallback, ['NVIDIA_NICO_API_PATH_PREFIX']),
         ),
     )

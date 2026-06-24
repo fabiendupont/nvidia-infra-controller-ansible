@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.tray_firmware
+module: nvidia.infra_controller.tray_firmware
 short_description: Manage Tray resources
 description:
 - Tray represents a component within a Rack.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   filter:
     type: dict
@@ -26,7 +26,8 @@ options:
 
 
       Constraints: `rackId` and `rackName` are mutually exclusive. `rackId`/`rackName` cannot be combined with `ids`/`componentIds`.
-      `componentIds` requires `type`.'
+      `componentIds` requires `type`. `slotId` requires `rackId` or `rackName`, must be >= 0, and composes with the rest of
+      the filter via AND.'
     suboptions:
       component_ids:
         type: list
@@ -46,6 +47,10 @@ options:
         type: str
         description:
         - rack_name parameter.
+      slot_id:
+        type: int
+        description:
+        - slot_id parameter.
       type:
         type: str
         description:
@@ -62,6 +67,19 @@ options:
     type: str
     description:
     - ID of the Site
+  targets:
+    type: list
+    description:
+    - "Optional subset of firmware targets to update within the targeted tray.\nNames are lowercase and select sub-parts of\
+      \ the tray\n(BMC, BIOS, etc.). The accepted set per tray type comes from\nthe Flow service's NICo proto bindings (which\
+      \ mirror Core's\nper-tray-type enums in `NICo-core/crates/rpc/proto/forge.proto`),\nso the supported values track Core\
+      \ as new sub-parts are added:\n  - switch trays (NvSwitchComponent): currently bmc, cpld, bios, nvos\n  - powershelf\
+      \ trays (PowerShelfComponent): currently pmc, psu\n  - compute trays (ComputeTrayComponent): currently bmc, bios\n \
+      \   (currently NOT honored end-to-end: the NICo compute-firmware\n    path goes through SetFirmwareUpdateTimeWindow\
+      \ + auto-update,\n    which has no per-target selection; the request is logged\n    and the whole bundle is applied.\
+      \ Will be honored once\n    compute moves to UpdateComponentFirmware.)\nOmitted or empty means \"update everything in\
+      \ the bundle\"\n(the historical default). Unknown names are rejected.\nRequires `version` to be set."
+    elements: str
   version:
     type: str
     description:
@@ -71,13 +89,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: Run firmware on all tray resources
-  nvidia.bare_metal.tray_firmware:
+  nvidia.infra_controller.tray_firmware:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Run firmware on a specific tray
-  nvidia.bare_metal.tray_firmware:
+  nvidia.infra_controller.tray_firmware:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -93,8 +111,8 @@ result:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import ActionResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import ActionResource
 
 
 ARGUMENT_SPEC = dict(
@@ -103,10 +121,12 @@ filter=dict(type='dict', options=dict(
     ids=dict(type='list', elements='str'),
     rack_id=dict(type='str'),
     rack_name=dict(type='str'),
+    slot_id=dict(type='int'),
     type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
 )),
 id=dict(type='str'),
 site_id=dict(type='str'),
+targets=dict(type='list', elements='str'),
 version=dict(type='str'),
 )
 
@@ -114,7 +134,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/tray/firmware',
     'resource_item_path': '/v2/org/{org}/carbide/tray/{id}/firmware',
     'method': 'PATCH',
-    'body_fields': ['site_id', 'version', 'filter'],
+    'body_fields': ['site_id', 'version', 'targets', 'filter'],
     'query_fields': [],
 }
 

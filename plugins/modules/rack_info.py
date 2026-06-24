@@ -10,15 +10,19 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.rack_info
+module: nvidia.infra_controller.rack_info
 short_description: Retrieve Rack information
 description:
 - Rack is a physical enclosure that contains a number of Machines. Racks are the physical building blocks of a Site.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  active_only:
+    type: bool
+    description:
+    - Restrict results to non-terminal Tasks.
   id:
     type: str
     description:
@@ -30,27 +34,27 @@ options:
   manufacturer:
     type: str
     description:
-    - Filter by manufacturer
+    - Filter racks by manufacturer
   name:
     type: str
     description:
-    - Filter by rack name
+    - Filter racks by name
   site_id:
     type: str
     description:
-    - ID of the Site to retrieve Racks from
+    - ID of the Site that owns the Rack.
 '''
 
 EXAMPLES = r'''
 ---
 - name: List all Rack resources
-  nvidia.bare_metal.rack_info:
+  nvidia.infra_controller.rack_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Rack by ID
-  nvidia.bare_metal.rack_info:
+  nvidia.infra_controller.rack_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -71,11 +75,12 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
+active_only=dict(type='bool'),
 id=dict(type='str'),
 include_components=dict(type='bool'),
 manufacturer=dict(type='str'),
@@ -84,10 +89,10 @@ site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/rack',
-    'resource_item_path': '/v2/org/{org}/carbide/rack/{id}',
+    'resource_path': '/v2/org/{org}/nico/rack/{id}/task',
+    'resource_item_path': '/v2/org/{org}/nico/rack/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer'],
+    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer', 'site_id', 'name', 'manufacturer', 'site_id', 'site_id', 'active_only'],
 }
 
 

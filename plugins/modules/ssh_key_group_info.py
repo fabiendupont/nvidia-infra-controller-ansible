@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.ssh_key_group_info
+module: nvidia.infra_controller.ssh_key_group_info
 short_description: Retrieve SSH Key Group information
 description:
 - SSH Key Groups allow grouping several SSH Keys together so they can be synced to Sites and used to access the Serial Console
   of Instances.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -54,13 +54,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all SSH Key Group resources
-  nvidia.bare_metal.ssh_key_group_info:
+  nvidia.infra_controller.ssh_key_group_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific SSH Key Group by ID
-  nvidia.bare_metal.ssh_key_group_info:
+  nvidia.infra_controller.ssh_key_group_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -81,8 +81,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
@@ -95,8 +95,8 @@ status=dict(type='str', choices=['Syncing', 'Synced', 'Error', 'Deleting']),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/sshkeygroup',
-    'resource_item_path': '/v2/org/{org}/carbide/sshkeygroup/{sshKeyGroupId}',
+    'resource_path': '/v2/org/{org}/nico/sshkeygroup',
+    'resource_item_path': '/v2/org/{org}/nico/sshkeygroup/{sshKeyGroupId}',
     'id_param': 'sshKeyGroupId',
     'filter_fields': ['site_id', 'instance_id', 'status', 'query'],
 }

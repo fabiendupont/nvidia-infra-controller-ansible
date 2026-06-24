@@ -7,8 +7,8 @@ __metaclass__ = type
 import re
 import time
 
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.client import BareMetalClient
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import (
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.client import NicoClient
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import (
     camel_to_snake,
     snake_to_camel,
     convert_keys,
@@ -67,7 +67,7 @@ class CrudResource(object):
     def __init__(self, module, config):
         self.module = module
         self.config = config
-        self.client = BareMetalClient(module)
+        self.client = NicoClient(module)
 
         self.resource_path = config['resource_path']
         self.resource_item_path = config['resource_item_path']
@@ -374,7 +374,7 @@ class InfoResource(object):
     def __init__(self, module, config):
         self.module = module
         self.config = config
-        self.client = BareMetalClient(module)
+        self.client = NicoClient(module)
 
         self.resource_path = config['resource_path']
         self.resource_item_path = config.get('resource_item_path')
@@ -422,7 +422,7 @@ class ActionResource(object):
     def __init__(self, module, config):
         self.module = module
         self.config = config
-        self.client = BareMetalClient(module)
+        self.client = NicoClient(module)
         self.collection_path = config['resource_path']
         self.item_path = config.get('resource_item_path')
         self.method = config.get('method', 'PATCH')
@@ -477,7 +477,7 @@ class BatchResource(object):
     def __init__(self, module, config):
         self.module = module
         self.config = config
-        self.client = BareMetalClient(module)
+        self.client = NicoClient(module)
 
         self.resource_path = config['resource_path']
         self.create_fields = config.get('create_schema_fields', [])

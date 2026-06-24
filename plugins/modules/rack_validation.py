@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.rack_validation
+module: nvidia.infra_controller.rack_validation
 short_description: Manage Rack resources
 description:
 - Rack is a physical enclosure that contains a number of Machines. Racks are the physical building blocks of a Site.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -28,13 +28,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: Run validation on all rack resources
-  nvidia.bare_metal.rack_validation:
+  nvidia.infra_controller.rack_validation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Run validation on a specific rack
-  nvidia.bare_metal.rack_validation:
+  nvidia.infra_controller.rack_validation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -50,8 +50,8 @@ result:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import ActionResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import ActionResource
 
 
 ARGUMENT_SPEC = dict(

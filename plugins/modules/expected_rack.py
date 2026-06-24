@@ -10,23 +10,51 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.vpc_peering
-short_description: Manage VPC Peering resources
+module: nvidia.infra_controller.expected_rack
+short_description: Manage Expected Rack resources
 description:
-- VPC Peering allows Instances in one VPC to communicate with Instances in another VPC on the same Site.
+- 'Expected Rack identifies a Rack that is expected to be discovered at a Site. Infrastructure Providers can pre-register
+  Expected Racks with an operator-supplied
+
+  rack identifier and a Rack Profile reference to help with Rack discovery and ingestion. Chassis identity and physical location
+  information are conveyed via
+
+  well-known label keys (`chassis.manufacturer`, `chassis.serial-number`, `chassis.model`, `location.region`, `location.datacenter`,
+  `location.room`, `location.position`).'
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
+  description:
+    type: str
+    description:
+    - Human-readable description of the Expected Rack
   id:
     type: str
     description:
     - ID of the resource. Used for lookup.
+  labels:
+    type: dict
+    description:
+    - User-defined key-value pairs for organizing and categorizing Expected Racks. Well-known keys (`chassis.*`, `location.*`)
+      are used to convey chassis identity and physical location.
+  name:
+    type: str
+    description:
+    - Human-readable name of the Expected Rack
+  rack_id:
+    type: str
+    description:
+    - Operator-supplied identifier for the rack (string, not UUID). Must be non-empty and unique within the Site.
+  rack_profile_id:
+    type: str
+    description:
+    - Identifier of the Rack Profile this rack conforms to. Must be non-empty.
   site_id:
     type: str
     description:
-    - ID of the Site where the peering exists
+    - ID of the Site the Expected Rack belongs to
   state:
     type: str
     description:
@@ -34,14 +62,6 @@ options:
     choices:
     - present
     - absent
-  vpc1_id:
-    type: str
-    description:
-    - ID of the first VPC in the peering
-  vpc2_id:
-    type: str
-    description:
-    - ID of the second VPC to peer with
   wait:
     type: bool
     description:
@@ -54,21 +74,21 @@ options:
 
 EXAMPLES = r'''
 ---
-- name: Create a VPC Peering
-  nvidia.infra_controller.vpc_peering:
+- name: Create a Expected Rack
+  nvidia.infra_controller.expected_rack:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: present
-    name: "my-vpc-peering"
+    name: "my-expected-rack"
 
-- name: Delete a VPC Peering
-  nvidia.infra_controller.vpc_peering:
+- name: Delete a Expected Rack
+  nvidia.infra_controller.expected_rack:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: absent
-    name: "my-vpc-peering"
+    name: "my-expected-rack"
 '''
 
 RETURN = r'''
@@ -85,22 +105,25 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
+description=dict(type='str'),
 id=dict(type='str'),
+labels=dict(type='dict'),
+name=dict(type='str'),
+rack_id=dict(type='str'),
+rack_profile_id=dict(type='str'),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
-vpc1_id=dict(type='str'),
-vpc2_id=dict(type='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/vpc-peering',
-    'resource_item_path': '/v2/org/{org}/nico/vpc-peering/{id}',
+    'resource_path': '/v2/org/{org}/nico/expected-rack/all',
+    'resource_item_path': '/v2/org/{org}/nico/expected-rack/{id}',
     'id_param': 'id',
-    'name_field': None,
-    'create_schema_fields': ['vpc1_id', 'vpc2_id', 'site_id'],
-    'update_schema_fields': [],
+    'name_field': 'name',
+    'create_schema_fields': ['site_id', 'rack_id', 'rack_profile_id', 'name', 'description', 'labels'],
+    'update_schema_fields': ['id', 'rack_id', 'rack_profile_id', 'name', 'description', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

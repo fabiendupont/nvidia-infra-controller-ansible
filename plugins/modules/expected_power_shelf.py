@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.expected_power_shelf
+module: nvidia.infra_controller.expected_power_shelf
 short_description: Manage Expected Power Shelf resources
 description:
 - 'Expected Power Shelf identifies a Power Shelf that is expected to be discovered at a Site. Infrastructure Providers can
@@ -18,10 +18,14 @@ description:
 
   credentials and serial numbers to help with Power Shelf discovery and ingestion.'
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  bmc_ip_address:
+    type: str
+    description:
+    - Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.
   bmc_mac_address:
     type: str
     description:
@@ -54,10 +58,6 @@ options:
     type: str
     description:
     - ID of the resource. Used for lookup.
-  ip_address:
-    type: str
-    description:
-    - IP address of the Expected Power Shelf
   labels:
     type: dict
     description:
@@ -114,7 +114,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Expected Power Shelf
-  nvidia.bare_metal.expected_power_shelf:
+  nvidia.infra_controller.expected_power_shelf:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -122,7 +122,7 @@ EXAMPLES = r'''
     name: "my-expected-power-shelf"
 
 - name: Delete a Expected Power Shelf
-  nvidia.bare_metal.expected_power_shelf:
+  nvidia.infra_controller.expected_power_shelf:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -139,11 +139,12 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
+bmc_ip_address=dict(type='str'),
 bmc_mac_address=dict(type='str'),
 default_bmc_password=dict(type='str'),
 default_bmc_username=dict(type='str'),
@@ -152,7 +153,6 @@ expected_power_shelf_id=dict(type='str'),
 firmware_version=dict(type='str'),
 host_id=dict(type='int'),
 id=dict(type='str'),
-ip_address=dict(type='str'),
 labels=dict(type='dict'),
 manufacturer=dict(type='str'),
 model=dict(type='str'),
@@ -168,12 +168,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/expected-power-shelf',
-    'resource_item_path': '/v2/org/{org}/carbide/expected-power-shelf/{expectedPowerShelfId}',
+    'resource_path': '/v2/org/{org}/nico/expected-power-shelf',
+    'resource_item_path': '/v2/org/{org}/nico/expected-power-shelf/{expectedPowerShelfId}',
     'id_param': 'expectedPowerShelfId',
     'name_field': 'name',
-    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

@@ -10,39 +10,57 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.tray_info
+module: nvidia.infra_controller.tray_info
 short_description: Retrieve Tray information
 description:
 - Tray represents a component within a Rack.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  active_only:
+    type: bool
+    description:
+    - Restrict results to non-terminal Tasks.
   component_id:
     type: str
     description:
-    - Filter by component ID. Can be specified multiple times to filter on more than one component ID. Requires 'type' parameter.
+    - Filter by external component ID (requires type; mutually exclusive with rackId/rackName; use repeated params for multiple
+      values)
   id:
     type: str
     description:
     - Filter by tray UUID. Can be specified multiple times to filter on more than one tray ID.
+  manufacturer:
+    type: str
+    description:
+    - Filter trays by manufacturer
+  name:
+    type: str
+    description:
+    - Filter trays by name
   rack_id:
     type: str
     description:
-    - Filter by Rack ID
+    - Scope to a specific Rack by ID (mutually exclusive with rackName)
   rack_name:
     type: str
     description:
-    - Filter by Rack name
+    - Scope to a specific Rack by name (mutually exclusive with rackId)
   site_id:
     type: str
     description:
-    - ID of the Site to retrieve Trays from
+    - ID of the Site that owns the Tray.
+  slot_id:
+    type: int
+    description:
+    - Restrict validation to trays at this rack slot (matches `position.slotId`). Requires `rackId` or `rackName`. Composes
+      with the rest of the filter via AND.
   type:
     type: str
     description:
-    - Filter by tray type
+    - Filter trays by type
     choices:
     - compute
     - switch
@@ -52,13 +70,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Tray resources
-  nvidia.bare_metal.tray_info:
+  nvidia.infra_controller.tray_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Tray by ID
-  nvidia.bare_metal.tray_info:
+  nvidia.infra_controller.tray_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -79,24 +97,28 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
+active_only=dict(type='bool'),
 component_id=dict(type='str'),
 id=dict(type='str'),
+manufacturer=dict(type='str'),
+name=dict(type='str'),
 rack_id=dict(type='str'),
 rack_name=dict(type='str'),
 site_id=dict(type='str'),
+slot_id=dict(type='int'),
 type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/tray',
-    'resource_item_path': '/v2/org/{org}/carbide/tray/{id}',
+    'resource_path': '/v2/org/{org}/nico/tray/{id}/task',
+    'resource_item_path': '/v2/org/{org}/nico/tray/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'component_id', 'id'],
+    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'component_id', 'id', 'slot_id', 'site_id', 'rack_id', 'rack_name', 'name', 'manufacturer', 'type', 'component_id', 'slot_id', 'site_id', 'site_id', 'active_only'],
 }
 
 

@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.tray_power
+module: nvidia.infra_controller.tray_power
 short_description: Manage Tray resources
 description:
 - Tray represents a component within a Rack.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   filter:
     type: dict
@@ -26,7 +26,8 @@ options:
 
 
       Constraints: `rackId` and `rackName` are mutually exclusive. `rackId`/`rackName` cannot be combined with `ids`/`componentIds`.
-      `componentIds` requires `type`.'
+      `componentIds` requires `type`. `slotId` requires `rackId` or `rackName`, must be >= 0, and composes with the rest of
+      the filter via AND.'
     suboptions:
       component_ids:
         type: list
@@ -46,6 +47,10 @@ options:
         type: str
         description:
         - rack_name parameter.
+      slot_id:
+        type: int
+        description:
+        - slot_id parameter.
       type:
         type: str
         description:
@@ -87,13 +92,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: Run power on all tray resources
-  nvidia.bare_metal.tray_power:
+  nvidia.infra_controller.tray_power:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Run power on a specific tray
-  nvidia.bare_metal.tray_power:
+  nvidia.infra_controller.tray_power:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -109,8 +114,8 @@ result:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import ActionResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import ActionResource
 
 
 ARGUMENT_SPEC = dict(
@@ -119,6 +124,7 @@ filter=dict(type='dict', options=dict(
     ids=dict(type='list', elements='str'),
     rack_id=dict(type='str'),
     rack_name=dict(type='str'),
+    slot_id=dict(type='int'),
     type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
 )),
 id=dict(type='str'),

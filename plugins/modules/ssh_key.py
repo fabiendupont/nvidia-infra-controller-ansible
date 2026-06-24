@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.ssh_key
+module: nvidia.infra_controller.ssh_key
 short_description: Manage SSH Key resources
 description:
 - SSH Key is a public key that can be used to access the Serial Console of an Instance.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -59,7 +59,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a SSH Key
-  nvidia.bare_metal.ssh_key:
+  nvidia.infra_controller.ssh_key:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -67,7 +67,7 @@ EXAMPLES = r'''
     name: "my-ssh-key"
 
 - name: Delete a SSH Key
-  nvidia.bare_metal.ssh_key:
+  nvidia.infra_controller.ssh_key:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -84,8 +84,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -100,8 +100,8 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/sshkey',
-    'resource_item_path': '/v2/org/{org}/carbide/sshkey/{sshKeyId}',
+    'resource_path': '/v2/org/{org}/nico/sshkey',
+    'resource_item_path': '/v2/org/{org}/nico/sshkey/{sshKeyId}',
     'id_param': 'sshKeyId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'public_key', 'ssh_key_group_id'],

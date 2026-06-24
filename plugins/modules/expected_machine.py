@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.expected_machine
+module: nvidia.infra_controller.expected_machine
 short_description: Manage Expected Machine resources
 description:
 - 'Expected Machine identifies a Machine that is expected to be discovered at a Site. Infrastructure Providers can pre-register
@@ -18,10 +18,14 @@ description:
 
   and serial numbers to help with Machine discovery and ingestion.'
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  bmc_ip_address:
+    type: str
+    description:
+    - Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.
   bmc_mac_address:
     type: str
     description:
@@ -86,7 +90,7 @@ options:
   site_id:
     type: str
     description:
-    - ID of the site the Expected Machine belongs to
+    - 'Scope filter: site_id.'
   sku_id:
     type: str
     description:
@@ -119,7 +123,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Expected Machine
-  nvidia.bare_metal.expected_machine:
+  nvidia.infra_controller.expected_machine:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -127,7 +131,7 @@ EXAMPLES = r'''
     name: "my-expected-machine"
 
 - name: Delete a Expected Machine
-  nvidia.bare_metal.expected_machine:
+  nvidia.infra_controller.expected_machine:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -144,11 +148,12 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
+bmc_ip_address=dict(type='str'),
 bmc_mac_address=dict(type='str'),
 chassis_serial_number=dict(type='str'),
 default_bmc_password=dict(type='str'),
@@ -174,12 +179,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/expected-machine',
-    'resource_item_path': '/v2/org/{org}/carbide/expected-machine/{expectedMachineId}',
+    'resource_path': '/v2/org/{org}/nico/expected-machine/batch',
+    'resource_item_path': '/v2/org/{org}/nico/expected-machine/{expectedMachineId}',
     'id_param': 'expectedMachineId',
     'name_field': 'name',
-    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'create_schema_fields': [],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

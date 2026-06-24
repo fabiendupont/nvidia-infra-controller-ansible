@@ -6,14 +6,18 @@ requires_ansible: '>=2.14.0'
 action_groups:
   all:
     - allocation
-    - allocation_constraint
-    - allocation_constraint_info
     - allocation_info
     - audit_info
     - dpu_extension_service
     - dpu_extension_service_info
     - expected_machine
     - expected_machine_info
+    - expected_power_shelf
+    - expected_power_shelf_info
+    - expected_rack
+    - expected_rack_info
+    - expected_switch
+    - expected_switch_info
     - infiniband_partition
     - infiniband_partition_info
     - infrastructure_provider_info
@@ -48,8 +52,11 @@ action_groups:
     - ssh_key_info
     - subnet
     - subnet_info
+    - task
+    - task_info
     - tenant_account
     - tenant_account_info
+    - tenant_identity_info
     - tenant_info
     - tray_firmware
     - tray_info
@@ -58,5 +65,7 @@ action_groups:
     - user_info
     - vpc
     - vpc_info
+    - vpc_peering
+    - vpc_peering_info
     - vpc_prefix
     - vpc_prefix_info

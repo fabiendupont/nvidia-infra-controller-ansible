@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.dpu_extension_service
+module: nvidia.infra_controller.dpu_extension_service
 short_description: Manage DPU Extension Service resources
 description:
 - DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only
   supported service type.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   credentials:
     type: dict
@@ -84,6 +84,10 @@ options:
     choices:
     - present
     - absent
+  version:
+    type: str
+    description:
+    - 'ID path parameter: version.'
   wait:
     type: bool
     description:
@@ -97,7 +101,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a DPU Extension Service
-  nvidia.bare_metal.dpu_extension_service:
+  nvidia.infra_controller.dpu_extension_service:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -105,7 +109,7 @@ EXAMPLES = r'''
     name: "my-dpu-extension-service"
 
 - name: Delete a DPU Extension Service
-  nvidia.bare_metal.dpu_extension_service:
+  nvidia.infra_controller.dpu_extension_service:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -122,8 +126,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -152,14 +156,15 @@ observability=dict(type='dict', options=dict(
 service_type=dict(type='str', choices=['KubernetesPod']),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
+version=dict(type='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/dpu-extension-service',
-    'resource_item_path': '/v2/org/{org}/carbide/dpu-extension-service/{dpuExtensionServiceId}',
-    'id_param': 'dpuExtensionServiceId',
+    'resource_path': '/v2/org/{org}/nico/dpu-extension-service',
+    'resource_item_path': '/v2/org/{org}/nico/dpu-extension-service/{dpuExtensionServiceId}/version/{version}',
+    'id_param': 'version',
     'name_field': 'name',
     'create_schema_fields': ['name', 'description', 'service_type', 'site_id', 'data', 'credentials', 'observability'],
     'update_schema_fields': ['name', 'description', 'data', 'credentials', 'observability'],

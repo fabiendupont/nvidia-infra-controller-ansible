@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.vpc_prefix
+module: nvidia.infra_controller.vpc_prefix
 short_description: Manage VPC Prefix resources
 description:
 - VPC Prefix is a network prefix belonging to an IP Block allocated to a Tenant. Tenant can use VPC Prefixes to enable network
   connectivity between their Instances.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -69,7 +69,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a VPC Prefix
-  nvidia.bare_metal.vpc_prefix:
+  nvidia.infra_controller.vpc_prefix:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -77,7 +77,7 @@ EXAMPLES = r'''
     name: "my-vpc-prefix"
 
 - name: Delete a VPC Prefix
-  nvidia.bare_metal.vpc_prefix:
+  nvidia.infra_controller.vpc_prefix:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -94,8 +94,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -112,8 +112,8 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/vpc-prefix',
-    'resource_item_path': '/v2/org/{org}/carbide/vpc-prefix/{vpcPrefixId}',
+    'resource_path': '/v2/org/{org}/nico/vpc-prefix',
+    'resource_item_path': '/v2/org/{org}/nico/vpc-prefix/{vpcPrefixId}',
     'id_param': 'vpcPrefixId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'vpc_id', 'ip_block_id', 'prefix_length'],

@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.nvlink_logical_partition_info
+module: nvidia.infra_controller.nvlink_logical_partition_info
 short_description: Retrieve NVLink Logical Partition information
 description:
 - NVLink Logical Partitions are used to group GPUs into logical partitions for shared memory and low-latency direct communication
   between GPUs.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -36,10 +36,19 @@ options:
     type: bool
     description:
     - Include VPCs in response.
+  instance_id:
+    type: str
+    description:
+    - Filter NVLink Interfaces by Instance ID.  Can be specified multiple times to filter on more than one ID.
+  nv_link_domain_id:
+    type: str
+    description:
+    - Filter NVLink Interfaces by NVLink Domain ID.  Can be specified multiple times to filter on more than one ID.
   nv_link_logical_partition_id:
     type: str
     description:
-    - 'ID path parameter: nv_link_logical_partition_id.'
+    - Filter NVLink Interfaces by NVLink Logical Partition ID.  Can be specified multiple times to filter on more than one
+      ID.
   query:
     type: str
     description:
@@ -47,23 +56,23 @@ options:
   site_id:
     type: str
     description:
-    - Filter NVLink Logical Partitions by Site
+    - Filter NVLink Interfaces by Site ID.  Can be specified multiple times to filter on more than one ID.
   status:
     type: str
     description:
-    - Filter NVLink Logical Partitions by Status
+    - Filter NVLink Interfaces by Status. Can be specified multiple times to filter on more than one status.
 '''
 
 EXAMPLES = r'''
 ---
 - name: List all NVLink Logical Partition resources
-  nvidia.bare_metal.nvlink_logical_partition_info:
+  nvidia.infra_controller.nvlink_logical_partition_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific NVLink Logical Partition by ID
-  nvidia.bare_metal.nvlink_logical_partition_info:
+  nvidia.infra_controller.nvlink_logical_partition_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -84,8 +93,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
@@ -93,6 +102,8 @@ id=dict(type='str'),
 include_interfaces=dict(type='bool'),
 include_stats=dict(type='bool'),
 include_vpcs=dict(type='bool'),
+instance_id=dict(type='str'),
+nv_link_domain_id=dict(type='str'),
 nv_link_logical_partition_id=dict(type='str'),
 query=dict(type='str'),
 site_id=dict(type='str'),
@@ -100,10 +111,10 @@ status=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/nvlink-logical-partition',
-    'resource_item_path': '/v2/org/{org}/carbide/nvlink-logical-partition/{nvLinkLogicalPartitionId}',
+    'resource_path': '/v2/org/{org}/nico/nvlink-interface',
+    'resource_item_path': '/v2/org/{org}/nico/nvlink-logical-partition/{nvLinkLogicalPartitionId}',
     'id_param': 'nvLinkLogicalPartitionId',
-    'filter_fields': ['site_id', 'status', 'query', 'include_interfaces', 'include_stats', 'include_vpcs'],
+    'filter_fields': ['site_id', 'status', 'query', 'include_interfaces', 'include_stats', 'include_vpcs', 'status', 'site_id', 'instance_id', 'nv_link_logical_partition_id', 'nv_link_domain_id'],
 }
 
 

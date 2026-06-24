@@ -10,16 +10,42 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.site
+module: nvidia.infra_controller.site
 short_description: Manage Site resources
 description:
 - Site is a datacenter that contains physical hardware and networking resources. All resources created by Provider or Tenant
   are directly or indirectly anchored to the Site object.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
+  capabilities:
+    type: dict
+    description:
+    - Modify Site capabilities. Can only be updated by Provider. Partial update allowed, only specify capabilities that should
+      be updated.
+    suboptions:
+      flow:
+        type: bool
+        description:
+        - flow parameter.
+      image_based_operating_system:
+        type: bool
+        description:
+        - image_based_operating_system parameter.
+      native_networking:
+        type: bool
+        description:
+        - native_networking parameter.
+      network_security_group:
+        type: bool
+        description:
+        - network_security_group parameter.
+      nv_link_partition:
+        type: bool
+        description:
+        - nv_link_partition parameter.
   contact:
     type: dict
     description:
@@ -110,7 +136,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Site
-  nvidia.bare_metal.site:
+  nvidia.infra_controller.site:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -118,7 +144,7 @@ EXAMPLES = r'''
     name: "my-site"
 
 - name: Delete a Site
-  nvidia.bare_metal.site:
+  nvidia.infra_controller.site:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -135,11 +161,18 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
+capabilities=dict(type='dict', options=dict(
+    flow=dict(type='bool'),
+    image_based_operating_system=dict(type='bool'),
+    native_networking=dict(type='bool'),
+    network_security_group=dict(type='bool'),
+    nv_link_partition=dict(type='bool'),
+)),
 contact=dict(type='dict', options=dict(
     email=dict(type='str'),
 )),
@@ -164,12 +197,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/site',
-    'resource_item_path': '/v2/org/{org}/carbide/site/{siteId}',
+    'resource_path': '/v2/org/{org}/nico/site/{siteId}/status-history',
+    'resource_item_path': '/v2/org/{org}/nico/site/{siteId}',
     'id_param': 'siteId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'description', 'serial_console_hostname', 'location', 'contact'],
-    'update_schema_fields': ['name', 'description', 'renew_registration_token', 'serial_console_hostname', 'is_serial_console_enabled', 'serial_console_idle_timeout', 'serial_console_max_session_length', 'is_serial_console_ssh_keys_enabled', 'location', 'contact'],
+    'update_schema_fields': ['name', 'description', 'renew_registration_token', 'serial_console_hostname', 'is_serial_console_enabled', 'serial_console_idle_timeout', 'serial_console_max_session_length', 'is_serial_console_ssh_keys_enabled', 'location', 'contact', 'capabilities'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

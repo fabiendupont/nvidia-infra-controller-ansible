@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.instance_info
+module: nvidia.infra_controller.instance_info
 short_description: Retrieve Instance information
 description:
 - Instance is a Machine provisioned with an Operating System by a Tenant and attached to one or more VPC Prefixes or Subnets.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
@@ -66,7 +66,7 @@ options:
   status:
     type: str
     description:
-    - Filter Instances by Status. Can be specified multiple times to filter on more than one status.
+    - Filter NVLink Interfaces by Status. Can be specified multiple times to filter on more than one status.
   vpc_id:
     type: str
     description:
@@ -76,13 +76,13 @@ options:
 EXAMPLES = r'''
 ---
 - name: List all Instance resources
-  nvidia.bare_metal.instance_info:
+  nvidia.infra_controller.instance_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Instance by ID
-  nvidia.bare_metal.instance_info:
+  nvidia.infra_controller.instance_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -103,8 +103,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
@@ -124,10 +124,10 @@ vpc_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/instance',
-    'resource_item_path': '/v2/org/{org}/carbide/instance/{instanceId}',
+    'resource_path': '/v2/org/{org}/nico/instance/{instanceId}/nvlink-interface',
+    'resource_item_path': '/v2/org/{org}/nico/instance/{instanceId}',
     'id_param': 'instanceId',
-    'filter_fields': ['infrastructure_provider_id', 'site_id', 'vpc_id', 'instance_type_id', 'operating_system_id', 'machine_id', 'name', 'status', 'ip_address', 'query', 'network_security_group_id'],
+    'filter_fields': ['infrastructure_provider_id', 'site_id', 'vpc_id', 'instance_type_id', 'operating_system_id', 'machine_id', 'name', 'status', 'ip_address', 'query', 'network_security_group_id', 'status', 'status', 'status'],
 }
 
 

@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.machine_info
+module: nvidia.infra_controller.machine_info
 short_description: Retrieve Machine information
 description:
 - Machine is a physical server that contains CPUs, GPUs, memory, storage, and networking hardware. Machines are the physical
   building blocks of a Site.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   capability_name:
     type: str
@@ -28,6 +28,18 @@ options:
     type: str
     description:
     - Filter Machines by Capability Type
+  capacity:
+    type: str
+    description:
+    - Filter Capabilities by Capacity value
+  count:
+    type: str
+    description:
+    - Filter Capabilities by Count
+  frequency:
+    type: str
+    description:
+    - Filter Capabilities by Frequency value
   has_instance:
     type: bool
     description:
@@ -35,7 +47,7 @@ options:
   has_instance_type:
     type: bool
     description:
-    - Filter Machines that have been assigned an Instance Type.
+    - Filter Capabilities by Machines that have an Instance Type
   hw_sku_device_type:
     type: str
     description:
@@ -44,6 +56,11 @@ options:
     type: str
     description:
     - Filter Machines by ID.  Can be specified multiple times to filter on more than one ID.
+  inactive_devices:
+    type: str
+    description:
+    - Filter Capabilities by Inactive Devices value. Since the value is an array, multiple query params should be specified
+      in correct order in order to filter. For example, to filter for [1, 3], specify inactiveDevices=1&inactiveDevices=3
   include_metadata:
     type: bool
     description:
@@ -60,6 +77,10 @@ options:
     type: str
     description:
     - 'ID path parameter: machine_id.'
+  name:
+    type: str
+    description:
+    - Filter Capabilities by Name
   query:
     type: str
     description:
@@ -67,7 +88,7 @@ options:
   site_id:
     type: str
     description:
-    - Filter Machines by Site ID
+    - Filter Capabilities by Machines from a particular Site
   status:
     type: str
     description:
@@ -77,18 +98,26 @@ options:
     description:
     - Filter Machines by ID of tenant of assigned instance. Can be specified multiple times to filter on more than one Tenant
       ID.
+  type:
+    type: str
+    description:
+    - Filter Capabilities by Type
+  vendor:
+    type: str
+    description:
+    - Filter Capabilities by Vendor
 '''
 
 EXAMPLES = r'''
 ---
 - name: List all Machine resources
-  nvidia.bare_metal.machine_info:
+  nvidia.infra_controller.machine_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
 - name: Get a specific Machine by ID
-  nvidia.bare_metal.machine_info:
+  nvidia.infra_controller.machine_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -109,32 +138,39 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
 capability_name=dict(type='str'),
 capability_type=dict(type='str'),
+capacity=dict(type='str'),
+count=dict(type='str'),
+frequency=dict(type='str'),
 has_instance=dict(type='bool'),
 has_instance_type=dict(type='bool'),
 hw_sku_device_type=dict(type='str'),
 id=dict(type='str'),
+inactive_devices=dict(type='str'),
 include_metadata=dict(type='bool'),
 instance_type_id=dict(type='str'),
 is_missing_on_site=dict(type='bool'),
 machine_id=dict(type='str'),
+name=dict(type='str'),
 query=dict(type='str'),
 site_id=dict(type='str'),
 status=dict(type='str'),
 tenant_id=dict(type='str'),
+type=dict(type='str'),
+vendor=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/machine',
-    'resource_item_path': '/v2/org/{org}/carbide/machine/{machineId}',
+    'resource_path': '/v2/org/{org}/nico/machine-capability',
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}',
     'id_param': 'machineId',
-    'filter_fields': ['site_id', 'id', 'has_instance_type', 'instance_type_id', 'tenant_id', 'has_instance', 'is_missing_on_site', 'include_metadata', 'status', 'capability_type', 'capability_name', 'hw_sku_device_type', 'query'],
+    'filter_fields': ['site_id', 'id', 'has_instance_type', 'instance_type_id', 'tenant_id', 'has_instance', 'is_missing_on_site', 'include_metadata', 'status', 'capability_type', 'capability_name', 'hw_sku_device_type', 'query', 'site_id', 'site_id', 'site_id', 'site_id', 'has_instance_type', 'type', 'name', 'frequency', 'capacity', 'vendor', 'inactive_devices', 'count'],
 }
 
 

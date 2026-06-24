@@ -10,19 +10,17 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.rack_bringup
-short_description: Manage rack_bringup resources
+module: nvidia.infra_controller.task
+short_description: Manage Task resources
 description:
-- Manage rack_bringup resources
+- Task represents an asynchronous, site-scoped operation (for example firmware update, power state change, or rack bring-up).
+  Tasks are created when operations run against Racks, Trays, or other components. Endpoints in this tag retrieve or cancel
+  a Task by ID; list Tasks for a Rack or Tray under the Rack and Tray tags.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
-  description:
-    type: str
-    description:
-    - Optional description for the bring up operation
   id:
     type: str
     description:
@@ -30,7 +28,7 @@ options:
   site_id:
     type: str
     description:
-    - ID of the Site
+    - ID of the Site that owns the task (tasks are site-scoped).
   state:
     type: str
     description:
@@ -50,21 +48,21 @@ options:
 
 EXAMPLES = r'''
 ---
-- name: Create a rack_bringup
-  nvidia.bare_metal.rack_bringup:
+- name: Create a Task
+  nvidia.infra_controller.task:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: present
-    name: "my-rack-bringup"
+    name: "my-task"
 
-- name: Delete a rack_bringup
-  nvidia.bare_metal.rack_bringup:
+- name: Delete a Task
+  nvidia.infra_controller.task:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: absent
-    name: "my-rack-bringup"
+    name: "my-task"
 '''
 
 RETURN = r'''
@@ -76,12 +74,11 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
-description=dict(type='str'),
 id=dict(type='str'),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
@@ -90,11 +87,11 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/rack/{id}/bringup',
-    'resource_item_path': '',
+    'resource_path': '/v2/org/{org}/nico/task/{id}/cancel',
+    'resource_item_path': '/v2/org/{org}/nico/task/{id}',
     'id_param': 'id',
     'name_field': None,
-    'create_schema_fields': ['site_id', 'description'],
+    'create_schema_fields': ['site_id'],
     'update_schema_fields': [],
     'scope_fields': [],
     'ready_statuses': ['Ready'],

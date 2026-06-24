@@ -10,23 +10,17 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.allocation_constraint_info
-short_description: Retrieve allocation_constraint information
+module: nvidia.infra_controller.task_info
+short_description: Retrieve Task information
 description:
-- Retrieve allocation_constraint information
+- Task represents an asynchronous, site-scoped operation (for example firmware update, power state change, or rack bring-up).
+  Tasks are created when operations run against Racks, Trays, or other components. Endpoints in this tag retrieve or cancel
+  a Task by ID; list Tasks for a Rack or Tray under the Rack and Tray tags.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
-  allocation_constraint_id:
-    type: str
-    description:
-    - 'ID path parameter: allocation_constraint_id.'
-  allocation_id:
-    type: str
-    description:
-    - 'ID path parameter: allocation_id.'
   id:
     type: str
     description:
@@ -35,14 +29,14 @@ options:
 
 EXAMPLES = r'''
 ---
-- name: List all allocation_constraint resources
-  nvidia.bare_metal.allocation_constraint_info:
+- name: List all Task resources
+  nvidia.infra_controller.task_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific allocation_constraint by ID
-  nvidia.bare_metal.allocation_constraint_info:
+- name: Get a specific Task by ID
+  nvidia.infra_controller.task_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -63,20 +57,18 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
-allocation_constraint_id=dict(type='str'),
-allocation_id=dict(type='str'),
 id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/allocation/{allocationId}/constraint',
-    'resource_item_path': '/v2/org/{org}/carbide/allocation/{allocationId}/constraint/{allocationConstraintId}',
-    'id_param': 'allocationConstraintId',
+    'resource_path': '/v2/org/{org}/nico/task/{id}/cancel',
+    'resource_item_path': '/v2/org/{org}/nico/task/{id}',
+    'id_param': 'id',
     'filter_fields': [],
 }
 

@@ -10,37 +10,43 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.instance
+module: nvidia.infra_controller.instance
 short_description: Manage Instance resources
 description:
 - Instance is a Machine provisioned with an Operating System by a Tenant and attached to one or more VPC Prefixes or Subnets.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
-  allow_unhealthy_machine:
-    type: bool
-    description:
-    - Set to true in order to target Machines are in maintenance or have health alerts preventing regular provision flow.
-      Requires Targeted Instance Creation capability enabled for Tenant
   always_boot_with_custom_ipxe:
     type: bool
     description:
-    - When set to true, the iPXE script specified by OS or overridden here will always be run when rebooting the Instance.
+    - When set to true, the iPXE script specified by OS or overridden here will always be run when rebooting the Instances.
       OS must be of iPXE type.
   apply_updates_on_reboot:
     type: bool
     description:
     - When specified, any updates pending for the Instance e.g. DPU reprovisioning, will be applied on reboot
+  auto_network:
+    type: bool
+    description:
+    - 'When true, asks NICo to auto-resolve each Instance''s network interfaces from the host''s underlay (HostInband) network
+      segments. Intended for instances on zero-DPU hosts (or hosts with their DPU in NIC mode). When true: (1) the target
+      VPC''s `networkVirtualizationType` MUST be `FLAT`, (2) `interfaces` MUST be empty or omitted, and (3) `secondaryVpcIds`
+      MUST be empty or omitted.'
+  count:
+    type: int
+    description:
+    - Number of instances to create in this batch. Minimum 2, maximum 18 (limited by topology domain size)
   description:
     type: str
     description:
-    - Description of the Instance, optional
+    - Description applied to all instances in the batch, optional
   dpu_extension_service_deployments:
     type: list
     description:
-    - DPU Extension Services to deploy to the DPUs of this Instance
+    - DPU Extension Services to deploy to all instances in the batch
     elements: dict
     suboptions:
       dpu_extension_service_id:
@@ -58,7 +64,7 @@ options:
   infiniband_interfaces:
     type: list
     description:
-    - Associate one or more Partitions with this Instance
+    - InfiniBand interface configuration shared across all instances
     elements: dict
     suboptions:
       device:
@@ -92,13 +98,14 @@ options:
   instance_type_id:
     type: str
     description:
-    - ID of the Instance Type to use for Instance
+    - ID of the Instance Type to use for all Instances in the batch
   interfaces:
     type: list
     description:
-    - At least one interface must be specified. Either Subnet or VPC Prefix interfaces allowed. Only one of the Subnets or
-      VPC Prefixes can be attached over Physical interface. If only one Subnet is specified, then it will be attached over
-      physical interface regardless of the value of isPhysical. In case of VPC Prefix, isPhysical will always be true
+    - 'Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork`
+      is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over
+      Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive
+      with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.'
     elements: dict
     suboptions:
       device:
@@ -109,6 +116,10 @@ options:
         type: int
         description:
         - device_instance parameter.
+      inline_routing_profile:
+        type: str
+        description:
+        - inline_routing_profile parameter.
       ip_address:
         type: str
         description:
@@ -150,37 +161,43 @@ options:
         type: str
         description:
         - category parameter.
+        required: true
         choices:
         - Hardware
         - Network
         - Performance
+        - Storage
+        - Software
         - Other
       details:
         type: str
         description:
         - details parameter.
+        required: true
       summary:
         type: str
         description:
         - summary parameter.
-  machine_id:
-    type: str
-    description:
-    - ID of of specific Machine to use for Instance. Requires Targeted Instance Creation capability enabled for Tenant
+        required: true
   name:
     type: str
     description:
-    - Name of the Instance
+    - Updated name for the Instance
+  name_prefix:
+    type: str
+    description:
+    - Prefix for instance names. Instances will be named with this prefix followed by a random 6-character suffix (e.g., "worker"
+      becomes "worker-abc123")
   network_security_group_id:
     type: str
     description:
-    - network_security_group_id parameter.
+    - ID of a Network Security Group to attach to all instances
   nv_link_interfaces:
     type: list
     description:
-    - Define Interfaces to associate Instance GPUs with NVLink Logical Partitions. A subset of GPUs may be specified (it is
-      not required to include all GPUs). Each item references one GPU index (`deviceInstance`) and one NVLink Logical Partition.
-      Different interfaces may reference different NVLink Logical Partitions.
+    - NVLink interface configuration shared across all instances. A subset of GPUs may be specified. Each item references
+      one GPU index (`deviceInstance`) and one NVLink Logical Partition. Different interfaces may reference different NVLink
+      Logical Partitions.
     elements: dict
     suboptions:
       device_instance:
@@ -198,7 +215,7 @@ options:
   phone_home_enabled:
     type: bool
     description:
-    - When set to true, the Instance will be enabled with the Phone Home service.
+    - When set to true, the Instances will be enabled with the Phone Home service.
   reboot_with_custom_ipxe:
     type: bool
     description:
@@ -207,14 +224,14 @@ options:
   secondary_vpc_ids:
     type: list
     description:
-    - IDs of additional VPCs the Instance should attach to through non-primary interfaces. This field may only be specified
+    - IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified
       when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the
       primary `vpcId`.
     elements: str
   ssh_key_group_ids:
     type: list
     description:
-    - Specify list of SSH Key Group IDs that will provide Serial over LAN access
+    - SSH Key Group IDs that will provide Serial over LAN access to all instances
     elements: str
   state:
     type: str
@@ -226,7 +243,12 @@ options:
   tenant_id:
     type: str
     description:
-    - ID of the Tenant creating the Instance
+    - ID of the Tenant creating the Instances
+  topology_optimized:
+    type: bool
+    description:
+    - When true (default), all instances must be allocated on machines within the same NVLink domain. When false, instances
+      can be spread across different NVLink domains.
   trigger_reboot:
     type: bool
     description:
@@ -234,11 +256,11 @@ options:
   user_data:
     type: str
     description:
-    - Can only be specified if allowOverride is set to true in Operating System
+    - User data applied to all instances. Can only be specified if allowOverride is set to true in Operating System
   vpc_id:
     type: str
     description:
-    - ID of the VPC the Instance should belong to
+    - ID of the VPC the Instances should belong to
   wait:
     type: bool
     description:
@@ -252,7 +274,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Instance
-  nvidia.bare_metal.instance:
+  nvidia.infra_controller.instance:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -260,7 +282,7 @@ EXAMPLES = r'''
     name: "my-instance"
 
 - name: Delete a Instance
-  nvidia.bare_metal.instance:
+  nvidia.infra_controller.instance:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -277,14 +299,15 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
-allow_unhealthy_machine=dict(type='bool'),
 always_boot_with_custom_ipxe=dict(type='bool'),
 apply_updates_on_reboot=dict(type='bool'),
+auto_network=dict(type='bool'),
+count=dict(type='int'),
 description=dict(type='str'),
 dpu_extension_service_deployments=dict(type='list', elements='dict', options=dict(
     dpu_extension_service_id=dict(type='str'),
@@ -304,6 +327,7 @@ instance_type_id=dict(type='str'),
 interfaces=dict(type='list', elements='dict', options=dict(
     device=dict(type='str'),
     device_instance=dict(type='int'),
+    inline_routing_profile=dict(type='str'),
     ip_address=dict(type='str'),
     is_physical=dict(type='bool'),
     subnet_id=dict(type='str'),
@@ -314,12 +338,12 @@ ipxe_script=dict(type='str'),
 is_repair_tenant=dict(type='bool'),
 labels=dict(type='dict'),
 machine_health_issue=dict(type='dict', options=dict(
-    category=dict(type='str', choices=['Hardware', 'Network', 'Performance', 'Other']),
-    details=dict(type='str'),
-    summary=dict(type='str'),
+    category=dict(type='str', required=True, choices=['Hardware', 'Network', 'Performance', 'Storage', 'Software', 'Other']),
+    details=dict(type='str', required=True),
+    summary=dict(type='str', required=True),
 )),
-machine_id=dict(type='str'),
 name=dict(type='str'),
+name_prefix=dict(type='str'),
 network_security_group_id=dict(type='str'),
 nv_link_interfaces=dict(type='list', elements='dict', options=dict(
     device_instance=dict(type='int'),
@@ -332,6 +356,7 @@ secondary_vpc_ids=dict(type='list', elements='str'),
 ssh_key_group_ids=dict(type='list', elements='str'),
 state=dict(type='str', choices=['present', 'absent']),
 tenant_id=dict(type='str'),
+topology_optimized=dict(type='bool'),
 trigger_reboot=dict(type='bool'),
 user_data=dict(type='str'),
 vpc_id=dict(type='str'),
@@ -340,12 +365,12 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/instance',
-    'resource_item_path': '/v2/org/{org}/carbide/instance/{instanceId}',
+    'resource_path': '/v2/org/{org}/nico/instance/{instanceId}/nvlink-interface',
+    'resource_item_path': '/v2/org/{org}/nico/instance/{instanceId}',
     'id_param': 'instanceId',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'tenant_id', 'instance_type_id', 'machine_id', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'infiniband_interfaces', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'allow_unhealthy_machine'],
-    'update_schema_fields': ['name', 'description', 'trigger_reboot', 'reboot_with_custom_ipxe', 'apply_updates_on_reboot', 'operating_system_id', 'ipxe_script', 'ssh_key_group_ids', 'network_security_group_id', 'user_data', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'secondary_vpc_ids', 'interfaces', 'infiniband_interfaces', 'nv_link_interfaces', 'dpu_extension_service_deployments'],
+    'create_schema_fields': ['name_prefix', 'count', 'description', 'tenant_id', 'instance_type_id', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'auto_network', 'infiniband_interfaces', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'topology_optimized'],
+    'update_schema_fields': ['name', 'description', 'trigger_reboot', 'reboot_with_custom_ipxe', 'apply_updates_on_reboot', 'operating_system_id', 'ipxe_script', 'ssh_key_group_ids', 'network_security_group_id', 'user_data', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'secondary_vpc_ids', 'interfaces', 'auto_network', 'infiniband_interfaces', 'nv_link_interfaces', 'dpu_extension_service_deployments'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

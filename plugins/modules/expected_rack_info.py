@@ -10,31 +10,42 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.rack_task_info
-short_description: Retrieve rack_task information
+module: nvidia.infra_controller.expected_rack_info
+short_description: Retrieve Expected Rack information
 description:
-- Retrieve rack_task information
+- 'Expected Rack identifies a Rack that is expected to be discovered at a Site. Infrastructure Providers can pre-register
+  Expected Racks with an operator-supplied
+
+  rack identifier and a Rack Profile reference to help with Rack discovery and ingestion. Chassis identity and physical location
+  information are conveyed via
+
+  well-known label keys (`chassis.manufacturer`, `chassis.serial-number`, `chassis.model`, `location.region`, `location.datacenter`,
+  `location.room`, `location.position`).'
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   id:
     type: str
     description:
     - ID of the resource to retrieve.
+  site_id:
+    type: str
+    description:
+    - ID of the Site to filter Expected Racks by
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all rack_task resources
-  nvidia.bare_metal.rack_task_info:
+- name: List all Expected Rack resources
+  nvidia.infra_controller.expected_rack_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific rack_task by ID
-  nvidia.bare_metal.rack_task_info:
+- name: Get a specific Expected Rack by ID
+  nvidia.infra_controller.expected_rack_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -55,19 +66,20 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import InfoResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import InfoResource
 
 
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
+site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '',
-    'resource_item_path': '/v2/org/{org}/carbide/rack/task/{id}',
+    'resource_path': '/v2/org/{org}/nico/expected-rack/all',
+    'resource_item_path': '/v2/org/{org}/nico/expected-rack/{id}',
     'id_param': 'id',
-    'filter_fields': [],
+    'filter_fields': ['site_id'],
 }
 
 

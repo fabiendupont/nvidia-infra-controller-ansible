@@ -14,14 +14,14 @@ PLUGINS_DIR = os.path.join(PROJECT_ROOT, 'plugins')
 # Add plugins to path for direct imports
 sys.path.insert(0, PLUGINS_DIR)
 
-# Create the ansible_collections.nvidia.bare_metal.plugins.module_utils namespace
+# Create the ansible_collections.nvidia.infra_controller.plugins.module_utils namespace
 # so that the fully-qualified imports in resource.py / client.py work
 _ns_packages = [
     'ansible_collections',
     'ansible_collections.nvidia',
-    'ansible_collections.nvidia.bare_metal',
-    'ansible_collections.nvidia.bare_metal.plugins',
-    'ansible_collections.nvidia.bare_metal.plugins.module_utils',
+    'ansible_collections.nvidia.infra_controller',
+    'ansible_collections.nvidia.infra_controller.plugins',
+    'ansible_collections.nvidia.infra_controller.plugins.module_utils',
 ]
 
 for pkg in _ns_packages:
@@ -31,8 +31,8 @@ for pkg in _ns_packages:
 
 # Point the module_utils to our plugins/module_utils
 import module_utils as _mu
-sys.modules['ansible_collections.nvidia.bare_metal.plugins.module_utils'] = _mu
-sys.modules['ansible_collections.nvidia.bare_metal.plugins.module_utils'].__path__ = _mu.__path__
+sys.modules['ansible_collections.nvidia.infra_controller.plugins.module_utils'] = _mu
+sys.modules['ansible_collections.nvidia.infra_controller.plugins.module_utils'].__path__ = _mu.__path__
 
 # Also ensure ansible.module_utils.urls and ansible.module_utils.basic are available
 # If ansible is not installed, create mocks

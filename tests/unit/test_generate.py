@@ -237,7 +237,7 @@ class TestFullGeneration:
     def spec_path(self):
         path = os.path.join(
             os.path.dirname(__file__), '..', '..', '..',
-            'bare-metal-manager-rest', 'openapi', 'spec.yaml',
+            'infra-controller', 'rest-api', 'openapi', 'spec.yaml',
         )
         if not os.path.exists(path):
             pytest.skip('OpenAPI spec not found')

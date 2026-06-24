@@ -11,12 +11,12 @@ class ModuleDocFragment(object):
 options:
     api_url:
         description:
-            - URL of the NVIDIA Bare Metal Manager API.
+            - URL of the NVIDIA Infra Controller API.
             - When using the NVIDIA proxy, set this to the proxy base URL.
         type: str
         required: true
         environment:
-            - name: NVIDIA_BMM_API_URL
+            - name: NVIDIA_NICO_API_URL
     api_token:
         description:
             - JWT bearer token for API authentication.
@@ -24,14 +24,14 @@ options:
         type: str
         required: true
         environment:
-            - name: NVIDIA_BMM_API_TOKEN
+            - name: NVIDIA_NICO_API_TOKEN
     org:
         description:
             - Organization name for API requests.
         type: str
         required: true
         environment:
-            - name: NVIDIA_BMM_ORG
+            - name: NVIDIA_NICO_ORG
     api_path_prefix:
         description:
             - API path prefix used in request URLs.
@@ -40,5 +40,5 @@ options:
         type: str
         default: carbide
         environment:
-            - name: NVIDIA_BMM_API_PATH_PREFIX
+            - name: NVIDIA_NICO_API_PATH_PREFIX
 '''

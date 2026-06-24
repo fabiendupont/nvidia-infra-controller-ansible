@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.bare_metal.network_security_group
+module: nvidia.infra_controller.network_security_group
 short_description: Manage Network Security Group resources
 description:
 - Network Security Group is a security policy that controls the traffic flowing between Instances.
 version_added: 1.0.0
-author: NVIDIA Bare Metal Manager Dev Team
+author: Fabien Dupont
 extends_documentation_fragment:
-- nvidia.bare_metal.auth
+- nvidia.infra_controller.auth
 options:
   description:
     type: str
@@ -126,7 +126,7 @@ options:
 EXAMPLES = r'''
 ---
 - name: Create a Network Security Group
-  nvidia.bare_metal.network_security_group:
+  nvidia.infra_controller.network_security_group:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -134,7 +134,7 @@ EXAMPLES = r'''
     name: "my-network-security-group"
 
 - name: Delete a Network Security Group
-  nvidia.bare_metal.network_security_group:
+  nvidia.infra_controller.network_security_group:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -151,8 +151,8 @@ resource:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.common import get_auth_argument_spec
-from ansible_collections.nvidia.bare_metal.plugins.module_utils.resource import CrudResource
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.common import get_auth_argument_spec
+from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource import CrudResource
 
 
 ARGUMENT_SPEC = dict(
@@ -180,8 +180,8 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/carbide/network-security-group',
-    'resource_item_path': '/v2/org/{org}/carbide/network-security-group/{networkSecurityGroupId}',
+    'resource_path': '/v2/org/{org}/nico/network-security-group',
+    'resource_item_path': '/v2/org/{org}/nico/network-security-group/{networkSecurityGroupId}',
     'id_param': 'networkSecurityGroupId',
     'name_field': 'name',
     'create_schema_fields': ['name', 'description', 'site_id', 'stateful_egress', 'rules', 'labels'],
