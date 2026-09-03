@@ -1,9 +1,23 @@
 # NVIDIA Infra Controller Ansible Collection
 
-`nvidia.infra_controller` is an Ansible collection for managing resources on the
-NVIDIA Infra Controller (NICo) REST API. All modules
-are generated from the OpenAPI specification, keeping them in sync with the
-API surface.
+![Collection version](https://img.shields.io/badge/version-2.0.2-blue)
+![Spec version](https://img.shields.io/badge/spec-2.0.0-blue)
+![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![Ansible](https://img.shields.io/badge/ansible-%3E%3D2.14-red)
+
+`nvidia.infra_controller` is an Ansible collection for automating
+[NVIDIA Infra Controller](https://github.com/NVIDIA/infra-controller) (NICo)
+infrastructure — GPU bare-metal provisioning, VPC networking, instance lifecycle,
+firmware management, and more. All modules are generated directly from the NICo
+OpenAPI specification and track the upstream API version exactly.
+
+**Use this collection to:**
+
+- Provision and deprovision GPU bare-metal instances at scale
+- Manage VPCs, subnets, IP blocks, and VPC peerings declaratively
+- Automate rack and tray bringup, validation, power control, and firmware updates
+- Build dynamic Ansible inventory from live NICo instance state
+- Integrate NICo resource management into CI/CD and GitOps pipelines
 
 ## Requirements
 
@@ -24,7 +38,7 @@ ansible-galaxy collection install git+https://github.com/fabiendupont/nvidia-inf
 ```bash
 cd nvidia-infra-controller-ansible
 ansible-galaxy collection build
-ansible-galaxy collection install nvidia-infra_controller-2.0.0.tar.gz
+ansible-galaxy collection install nvidia-infra_controller-2.0.2.tar.gz
 ```
 
 ## Authentication

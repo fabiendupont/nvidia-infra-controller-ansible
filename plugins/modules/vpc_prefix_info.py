@@ -27,17 +27,17 @@ options:
   include_usage_stats:
     type: bool
     description:
-    - When true, each VPC Prefix object includes usage statistic using the same structure as IP Block usage. Prefix and IP
+    - When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP
       usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes
       a `/31` prefix.
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name and status fields
+    - Search for matches across all VPC Prefixes. Input will be matched against name and status fields
   site_id:
     type: str
     description:
-    - Filter VPC Prefixes by Site, required if vpcId query param is not specified
+    - Filter VPC Prefixes by Site, required if the vpcId query parameter is not specified
   status:
     type: str
     description:

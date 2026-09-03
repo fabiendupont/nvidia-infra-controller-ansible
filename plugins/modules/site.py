@@ -49,7 +49,7 @@ options:
   contact:
     type: dict
     description:
-    - Contact for the Site
+    - Site contact information
     suboptions:
       email:
         type: str
@@ -76,7 +76,7 @@ options:
   location:
     type: dict
     description:
-    - Location of the Site
+    - Site location information
     suboptions:
       city:
         type: str

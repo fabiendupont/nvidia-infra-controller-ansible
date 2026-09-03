@@ -3,11 +3,11 @@
 
 namespace: nvidia
 name: infra_controller
-version: 2.0.0
+version: 2.0.2
 readme: README.md
 authors:
   - Fabien Dupont
-description: Ansible collection for managing NVIDIA Infra Controller resources
+description: Ansible collection for NVIDIA Infra Controller (NICo) — automate GPU bare-metal provisioning, VPCs, networking, and instance lifecycle via the REST API
 license:
   - Apache-2.0
 tags:
@@ -15,5 +15,13 @@ tags:
   - infra_controller
   - infrastructure
   - nico
+  - gpu
+  - bare_metal
+  - networking
+  - cloud
+  - datacenter
+  - openapi
+  - rest_api
+  - automation
 repository: https://github.com/fabiendupont/nvidia-infra-controller-ansible
-spec_version: "1.6.0"
+spec_version: "2.0.0"

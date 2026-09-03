@@ -23,7 +23,7 @@ options:
   exclude_unallocated:
     type: bool
     description:
-    - Excludes InstanceType records that have no allocations from being returned in the result set. Currently can only be
+    - Excludes Instance Type records that have no allocations from being returned in the result set. Currently can only be
       requested by Tenant.
   id:
     type: str
@@ -52,8 +52,8 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, display name, description, labels and status
-      fields
+    - Search for matches across all Instance Types. Input will be matched against name, display name, description, labels,
+      and status fields
   site_id:
     type: str
     description:

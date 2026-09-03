@@ -59,8 +59,8 @@ options:
   inactive_devices:
     type: str
     description:
-    - Filter Capabilities by Inactive Devices value. Since the value is an array, multiple query params should be specified
-      in correct order in order to filter. For example, to filter for [1, 3], specify inactiveDevices=1&inactiveDevices=3
+    - Filter Capabilities by Inactive Devices value. Since the value is an array, multiple query parameters should be specified
+      in the correct order. For example, to filter for [1, 3], specify inactiveDevices=1&inactiveDevices=3
   include_metadata:
     type: bool
     description:

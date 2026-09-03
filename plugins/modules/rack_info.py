@@ -31,6 +31,10 @@ options:
     type: bool
     description:
     - Include rack components in response
+  include_report:
+    type: bool
+    description:
+    - Include the per-task execution report on each returned task.
   manufacturer:
     type: str
     description:
@@ -83,6 +87,7 @@ ARGUMENT_SPEC = dict(
 active_only=dict(type='bool'),
 id=dict(type='str'),
 include_components=dict(type='bool'),
+include_report=dict(type='bool'),
 manufacturer=dict(type='str'),
 name=dict(type='str'),
 site_id=dict(type='str'),
@@ -92,7 +97,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/rack/{id}/task',
     'resource_item_path': '/v2/org/{org}/nico/rack/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer', 'site_id', 'name', 'manufacturer', 'site_id', 'site_id', 'active_only'],
+    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer', 'site_id', 'name', 'manufacturer', 'site_id', 'site_id', 'active_only', 'include_report'],
 }
 
 

@@ -22,7 +22,7 @@ options:
   description:
     type: str
     description:
-    - description parameter.
+    - Description of the Network Security Group
   id:
     type: str
     description:
@@ -30,11 +30,11 @@ options:
   labels:
     type: dict
     description:
-    - labels parameter.
+    - User-defined key-value labels for the Network Security Group
   name:
     type: str
     description:
-    - name parameter.
+    - Name of the Network Security Group
   network_security_group_id:
     type: str
     description:
@@ -42,7 +42,7 @@ options:
   rules:
     type: list
     description:
-    - rules parameter.
+    - Rules that belong to the Network Security Group
     elements: dict
     suboptions:
       action:
@@ -87,6 +87,7 @@ options:
         - TCP
         - UDP
         - ICMP
+        - ICMP6
         - ANY
       source_port_range:
         type: str
@@ -100,7 +101,7 @@ options:
   site_id:
     type: str
     description:
-    - site_id parameter.
+    - ID of the Site
   state:
     type: str
     description:
@@ -168,7 +169,7 @@ rules=dict(type='list', elements='dict', options=dict(
     direction=dict(type='str', required=True, choices=['INGRESS', 'EGRESS']),
     name=dict(type='str'),
     priority=dict(type='int'),
-    protocol=dict(type='str', required=True, choices=['TCP', 'UDP', 'ICMP', 'ANY']),
+    protocol=dict(type='str', required=True, choices=['TCP', 'UDP', 'ICMP', 'ICMP6', 'ANY']),
     source_port_range=dict(type='str'),
     source_prefix=dict(type='str', required=True),
 )),
@@ -184,7 +185,7 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/network-security-group/{networkSecurityGroupId}',
     'id_param': 'networkSecurityGroupId',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'site_id', 'stateful_egress', 'rules', 'labels'],
+    'create_schema_fields': ['id', 'name', 'description', 'site_id', 'stateful_egress', 'rules', 'labels'],
     'update_schema_fields': ['name', 'description', 'stateful_egress', 'rules', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],

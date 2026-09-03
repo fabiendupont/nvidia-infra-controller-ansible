@@ -13,10 +13,10 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.expected_switch_info
 short_description: Retrieve Expected Switch information
 description:
-- 'Expected Switch identifies a Switch that is expected to be discovered at a Site. Infrastructure Providers can pre-register
-  Expected Switches using BMC, NvOS credentials
+- 'Expected Switch identifies an NVLink Switch that is expected to be discovered at a Site. Infrastructure Providers can pre-register
+  Expected Switches using BMC, NVOS credentials
 
-  and serial numbers to help with Switch discovery and ingestion.'
+  and serial numbers to help with NVLink Switch discovery and ingestion.'
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:

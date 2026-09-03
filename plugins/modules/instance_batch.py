@@ -137,7 +137,7 @@ options:
   labels:
     type: dict
     description:
-    - labels parameter.
+    - Key-value objects to be applied to all instances (shared across all instances)
   name_prefix:
     type: str
     description:
@@ -160,10 +160,10 @@ options:
         type: int
         description:
         - device_instance parameter.
-      nv_linklogical_partition_id:
+      nv_link_logical_partition_id:
         type: str
         description:
-        - nv_linklogical_partition_id parameter.
+        - nv_link_logical_partition_id parameter.
   operating_system_id:
     type: str
     description:
@@ -262,7 +262,7 @@ name_prefix=dict(type='str', required=True),
 network_security_group_id=dict(type='str'),
 nv_link_interfaces=dict(type='list', elements='dict', options=dict(
     device_instance=dict(type='int'),
-    nv_linklogical_partition_id=dict(type='str'),
+    nv_link_logical_partition_id=dict(type='str'),
 )),
 operating_system_id=dict(type='str'),
 phone_home_enabled=dict(type='bool'),

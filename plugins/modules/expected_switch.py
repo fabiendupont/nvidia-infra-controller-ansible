@@ -13,10 +13,10 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.expected_switch
 short_description: Manage Expected Switch resources
 description:
-- 'Expected Switch identifies a Switch that is expected to be discovered at a Site. Infrastructure Providers can pre-register
-  Expected Switches using BMC, NvOS credentials
+- 'Expected Switch identifies an NVLink Switch that is expected to be discovered at a Site. Infrastructure Providers can pre-register
+  Expected Switches using BMC, NVOS credentials
 
-  and serial numbers to help with Switch discovery and ingestion.'
+  and serial numbers to help with NVLink Switch discovery and ingestion.'
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
@@ -46,10 +46,6 @@ options:
     type: str
     description:
     - 'ID path parameter: expected_switch_id.'
-  firmware_version:
-    type: str
-    description:
-    - Firmware version of this component
   host_id:
     type: int
     description:
@@ -158,7 +154,6 @@ default_bmc_password=dict(type='str'),
 default_bmc_username=dict(type='str'),
 description=dict(type='str'),
 expected_switch_id=dict(type='str'),
-firmware_version=dict(type='str'),
 host_id=dict(type='int'),
 id=dict(type='str'),
 labels=dict(type='dict'),
@@ -182,8 +177,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/expected-switch/{expectedSwitchId}',
     'id_param': 'expectedSwitchId',
     'name_field': 'name',
-    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

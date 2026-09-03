@@ -32,6 +32,10 @@ options:
     type: str
     description:
     - Filter by tray UUID. Can be specified multiple times to filter on more than one tray ID.
+  include_report:
+    type: bool
+    description:
+    - Include the per-task execution report on each returned task.
   manufacturer:
     type: str
     description:
@@ -62,9 +66,9 @@ options:
     description:
     - Filter trays by type
     choices:
-    - compute
-    - switch
-    - powershelf
+    - Compute
+    - NVSwitch
+    - PowerShelf
 '''
 
 EXAMPLES = r'''
@@ -105,20 +109,21 @@ ARGUMENT_SPEC = dict(
 active_only=dict(type='bool'),
 component_id=dict(type='str'),
 id=dict(type='str'),
+include_report=dict(type='bool'),
 manufacturer=dict(type='str'),
 name=dict(type='str'),
 rack_id=dict(type='str'),
 rack_name=dict(type='str'),
 site_id=dict(type='str'),
 slot_id=dict(type='int'),
-type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
+type=dict(type='str', choices=['Compute', 'NVSwitch', 'PowerShelf']),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/tray/{id}/task',
     'resource_item_path': '/v2/org/{org}/nico/tray/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'component_id', 'id', 'slot_id', 'site_id', 'rack_id', 'rack_name', 'name', 'manufacturer', 'type', 'component_id', 'slot_id', 'site_id', 'site_id', 'active_only'],
+    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'component_id', 'id', 'slot_id', 'site_id', 'rack_id', 'rack_name', 'name', 'manufacturer', 'type', 'component_id', 'slot_id', 'site_id', 'site_id', 'active_only', 'include_report'],
 }
 
 

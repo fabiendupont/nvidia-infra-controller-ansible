@@ -27,7 +27,7 @@ options:
   include_machine_stats:
     type: bool
     description:
-    - Include a breakdown of Machine counts by life-cycle status and health. Requires Provider Admin role.
+    - Include a breakdown of Machine counts by lifecycle status and health. Requires Provider Admin role.
   infrastructure_provider_id:
     type: str
     description:

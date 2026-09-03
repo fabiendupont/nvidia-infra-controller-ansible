@@ -46,10 +46,6 @@ options:
     type: str
     description:
     - 'ID path parameter: expected_power_shelf_id.'
-  firmware_version:
-    type: str
-    description:
-    - Firmware version of this component
   host_id:
     type: int
     description:
@@ -150,7 +146,6 @@ default_bmc_password=dict(type='str'),
 default_bmc_username=dict(type='str'),
 description=dict(type='str'),
 expected_power_shelf_id=dict(type='str'),
-firmware_version=dict(type='str'),
 host_id=dict(type='int'),
 id=dict(type='str'),
 labels=dict(type='dict'),
@@ -172,8 +167,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/expected-power-shelf/{expectedPowerShelfId}',
     'id_param': 'expectedPowerShelfId',
     'name_field': 'name',
-    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'shelf_serial_number', 'bmc_ip_address', 'rack_id', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

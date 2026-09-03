@@ -26,7 +26,7 @@ options:
   allocation_constraints:
     type: list
     description:
-    - allocation_constraints parameter.
+    - List of Allocation Constraint objects
     elements: dict
     suboptions:
       constraint_type:

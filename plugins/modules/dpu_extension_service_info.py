@@ -31,7 +31,7 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, description and status
+    - Search for matches across all DPU Extension Services. Input will be matched against name, description, and status fields
   site_id:
     type: str
     description:

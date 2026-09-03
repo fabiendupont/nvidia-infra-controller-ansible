@@ -38,7 +38,7 @@ options:
   labels:
     type: dict
     description:
-    - String key value pairs describing Partition labels. Up to 10 key value pairs can be specified
+    - String key-value pairs describing Partition labels. Up to 10 key-value pairs can be specified
   name:
     type: str
     description:

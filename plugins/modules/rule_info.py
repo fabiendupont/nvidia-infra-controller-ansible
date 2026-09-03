@@ -10,30 +10,45 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.service_account_info
-short_description: Retrieve Service Account information
+module: nvidia.infra_controller.rule_info
+short_description: Retrieve Rule information
 description:
-- 'When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service
-  accounts, the Tenant entity is initialized as a
-
-  privileged Tenant with `targetedInstanceCreation` capability enabled.'
+- 'Operation Rule defines, per Site, how a particular operation (for example `PowerControl` / `power_on` or `FirmwareControl`
+  / `upgrade`) should be executed against a set of components: ordered execution stages, per-component-type concurrency, pre
+  / main / post actions, timeouts, and retry policy. Rules are reusable templates owned by Flow; this tag exposes CRUD (`POST`,
+  `GET`, `PATCH`, `DELETE`) over them.'
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
-options: {}
+options:
+  id:
+    type: str
+    description:
+    - ID of the resource to retrieve.
+  operation_type:
+    type: str
+    description:
+    - Filter by operation type.
+    choices:
+    - PowerControl
+    - FirmwareControl
+  site_id:
+    type: str
+    description:
+    - ID of the Site that owns the rules (rules are site-scoped).
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all Service Account resources
-  nvidia.infra_controller.service_account_info:
+- name: List all Rule resources
+  nvidia.infra_controller.rule_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific Service Account by ID
-  nvidia.infra_controller.service_account_info:
+- name: Get a specific Rule by ID
+  nvidia.infra_controller.rule_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -59,14 +74,16 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-
+id=dict(type='str'),
+operation_type=dict(type='str', choices=['PowerControl', 'FirmwareControl']),
+site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/service-account/current',
-    'resource_item_path': '',
+    'resource_path': '/v2/org/{org}/nico/task/rule',
+    'resource_item_path': '/v2/org/{org}/nico/task/rule/{id}',
     'id_param': 'id',
-    'filter_fields': [],
+    'filter_fields': ['site_id', 'operation_type'],
 }
 
 

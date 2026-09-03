@@ -55,18 +55,27 @@ options:
     description:
     - Serial numbers of the Expected Machine's fallback DPUs (Data Processing Units)
     elements: str
-  firmware_version:
-    type: str
-    description:
-    - Firmware version of this component
   host_id:
     type: int
     description:
     - Host ID within the tray
+  host_lifecycle_profile:
+    type: dict
+    description:
+    - Optional per-host lifecycle profile
+    suboptions:
+      disable_lockdown:
+        type: bool
+        description:
+        - disable_lockdown parameter.
   id:
     type: str
     description:
     - ID of the resource. Used for lookup.
+  is_dpf_enabled:
+    type: bool
+    description:
+    - When true, this host is eligible for DPF-based provisioning.
   labels:
     type: dict
     description:
@@ -161,9 +170,12 @@ default_bmc_username=dict(type='str'),
 description=dict(type='str'),
 expected_machine_id=dict(type='str'),
 fallback_dpu_serial_numbers=dict(type='list', elements='str'),
-firmware_version=dict(type='str'),
 host_id=dict(type='int'),
+host_lifecycle_profile=dict(type='dict', options=dict(
+    disable_lockdown=dict(type='bool'),
+)),
 id=dict(type='str'),
+is_dpf_enabled=dict(type='bool'),
 labels=dict(type='dict'),
 manufacturer=dict(type='str'),
 model=dict(type='str'),
@@ -184,7 +196,7 @@ RESOURCE_CONFIG = {
     'id_param': 'expectedMachineId',
     'name_field': 'name',
     'create_schema_fields': [],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'firmware_version', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'is_dpf_enabled', 'labels', 'host_lifecycle_profile'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

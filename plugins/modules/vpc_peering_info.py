@@ -27,10 +27,29 @@ options:
     type: bool
     description:
     - Optional filter by peering tenancy type (single-tenant or multi-tenant).
+  peer_tenant_id:
+    type: str
+    description:
+    - Optional filter by tenant ID of a VPC involved in the peering. Repeat the parameter to match multiple tenants.
   site_id:
     type: str
     description:
     - Optional Site ID filter. If provided, caller must have access to the specified Site.
+  status:
+    type: str
+    description:
+    - Optional filter by peering status. Repeat the parameter to match multiple statuses.
+    choices:
+    - Pending
+    - Configuring
+    - Requested
+    - Ready
+    - Deleting
+    - Error
+  vpc_id:
+    type: str
+    description:
+    - Optional filter by VPC ID involved in the peering as either vpc1 or vpc2. Repeat the parameter to match multiple VPCs.
 '''
 
 EXAMPLES = r'''
@@ -70,14 +89,17 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
 is_multi_tenant=dict(type='bool'),
+peer_tenant_id=dict(type='str'),
 site_id=dict(type='str'),
+status=dict(type='str', choices=['Pending', 'Configuring', 'Requested', 'Ready', 'Deleting', 'Error']),
+vpc_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/vpc-peering',
     'resource_item_path': '/v2/org/{org}/nico/vpc-peering/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'is_multi_tenant'],
+    'filter_fields': ['site_id', 'is_multi_tenant', 'status', 'vpc_id', 'peer_tenant_id'],
 }
 
 

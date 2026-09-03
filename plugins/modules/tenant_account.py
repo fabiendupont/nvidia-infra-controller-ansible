@@ -31,7 +31,8 @@ options:
   infrastructure_provider_id:
     type: str
     description:
-    - infrastructure_provider_id parameter.
+    - "Deprecated; inferred from the caller's org Infrastructure Provider\nwhen omitted. When provided, the value must match\
+      \ the org's\nInfrastructure Provider \u2014 mismatched values are rejected with 400."
   state:
     type: str
     description:

@@ -31,7 +31,8 @@ options:
   infrastructure_provider_id:
     type: str
     description:
-    - Filter TenantAccounts by Infrastructure Provider ID
+    - 'Filter Tenant Accounts by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the
+      org''s membership.'
   query:
     type: str
     description:
@@ -39,7 +40,7 @@ options:
   tenant_id:
     type: str
     description:
-    - Filter TenantAccounts by Tenant ID
+    - Filter Tenant Accounts by Tenant ID
 '''
 
 EXAMPLES = r'''

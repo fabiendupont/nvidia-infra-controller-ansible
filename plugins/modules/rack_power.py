@@ -22,7 +22,7 @@ options:
   filter:
     type: dict
     description:
-    - Filter criteria for selecting racks in batch operations. If omitted or empty, all racks in the site are targeted.
+    - Filter that selects Racks whose power state should be updated
     suboptions:
       names:
         type: list
@@ -33,6 +33,22 @@ options:
     type: str
     description:
     - ID of the resource. When provided, targets a single resource.
+  override_readiness_check:
+    type: bool
+    description:
+    - 'When true, proceed even if one or more target components (or hosts
+
+      on the owning rack for rack-scoped components) are reported as not
+
+      ready by their persisted status. Intended for operator-supervised
+
+      maintenance.'
+  rule_id:
+    type: str
+    description:
+    - 'Optional Operation Rule UUID. When set, pins this operation to the
+
+      named rule and overrides Flow''s default rule resolution.'
   site_id:
     type: str
     description:
@@ -93,6 +109,8 @@ filter=dict(type='dict', options=dict(
     names=dict(type='list', elements='str'),
 )),
 id=dict(type='str'),
+override_readiness_check=dict(type='bool'),
+rule_id=dict(type='str'),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['on', 'off', 'cycle', 'forceoff', 'forcecycle']),
 )
@@ -101,7 +119,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/rack/power',
     'resource_item_path': '/v2/org/{org}/carbide/rack/{id}/power',
     'method': 'PATCH',
-    'body_fields': ['site_id', 'state', 'filter'],
+    'body_fields': ['site_id', 'state', 'rule_id', 'override_readiness_check', 'filter'],
     'query_fields': [],
 }
 

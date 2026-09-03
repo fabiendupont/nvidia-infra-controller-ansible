@@ -42,7 +42,7 @@ options:
   image_auth_type:
     type: str
     description:
-    - Authentication type for image URL if needed e.g. basic/bearer/token, required is imageAuthToken is specified
+    - Authentication type for image URL, if needed, e.g., basic/bearer/token; required if imageAuthToken is specified
   image_disk:
     type: str
     description:
@@ -50,11 +50,11 @@ options:
   image_sha:
     type: str
     description:
-    - SHA hash of the image file, required for image based OS
+    - SHA hash of the image file, required for image-based OS
   image_url:
     type: str
     description:
-    - Original URL from where the Operating System image can be retreived from, required for image based OS. Cannot be specified
+    - Original URL from which the Operating System image can be retrieved; required for image-based OS. Cannot be specified
       if ipxeScript is specified
   infrastructure_provider_id:
     type: str
@@ -63,7 +63,7 @@ options:
   ipxe_script:
     type: str
     description:
-    - iPXE script or URL, only applicable for iPXE based OS. Cannot be specified if imageUrl is specified
+    - iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified
   is_active:
     type: bool
     description:
@@ -71,7 +71,7 @@ options:
   is_cloud_init:
     type: bool
     description:
-    - Specified when the Operating System is Cloud Init based
+    - Specified when the Operating System is cloud-init based
   name:
     type: str
     description:
@@ -87,15 +87,15 @@ options:
   root_fs_id:
     type: str
     description:
-    - Root filesystem UUID, this or `rootFsLabel` required for image based OS
+    - Root filesystem UUID; this or `rootFsLabel` is required for image-based OS
   root_fs_label:
     type: str
     description:
-    - Root filesystem label, this or `rootFsId` required for image based OS
+    - Root filesystem label; this or `rootFsId` is required for image-based OS
   site_ids:
     type: list
     description:
-    - Specified only one Site if an Operating System is Image based, more than one Site is not supported"
+    - Specify only one Site if an Operating System is image-based; more than one Site is not supported.
     elements: str
   state:
     type: str

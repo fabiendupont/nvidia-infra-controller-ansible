@@ -34,7 +34,7 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, description and status fields
+    - Search for matches across all Network Security Groups. Input will be matched against name, description, and status fields
   site_id:
     type: str
     description:

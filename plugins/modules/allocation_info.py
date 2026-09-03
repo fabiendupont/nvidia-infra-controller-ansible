@@ -30,7 +30,7 @@ options:
   constraint_type:
     type: str
     description:
-    - Filter Allocations by Constraint Type.  Can be specified multiple times to filter on more than one Constraint Type.
+    - Filter Allocations by Constraint Type. Can be specified multiple times to filter on more than one Constraint Type.
     choices:
     - Reserved
     - OnDemand
@@ -38,11 +38,11 @@ options:
   constraint_value:
     type: int
     description:
-    - Filter Allocations by Constraint Value.  Can be specified multiple times to filter on more than one Constraint Value.
+    - Filter Allocations by Constraint Value. Can be specified multiple times to filter on more than one Constraint Value.
   id:
     type: str
     description:
-    - Filter Allocations by ID.  Can be specified multiple times to filter on more than one ID.
+    - Filter Allocations by ID. Can be specified multiple times to filter on more than one ID.
   infrastructure_provider_id:
     type: str
     description:
@@ -50,11 +50,11 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, description and status fields
+    - Search for matches across all Allocations. Input will be matched against name, description, and status fields
   resource_type:
     type: str
     description:
-    - Filter Allocations by Constraint Resource Type.  Can be specified multiple times to filter on more than one Constraint
+    - Filter Allocations by Constraint Resource Type. Can be specified multiple times to filter on more than one Constraint
       Resource Type.
     choices:
     - InstanceType
@@ -62,16 +62,16 @@ options:
   resource_type_id:
     type: str
     description:
-    - Filter Allocations by Constraint Resource Type ID.  Can be specified multiple times to filter on more than one Constraint
+    - Filter Allocations by Constraint Resource Type ID. Can be specified multiple times to filter on more than one Constraint
       Resource Type ID.
   site_id:
     type: str
     description:
-    - Filter Allocations by Site ID.  Can be specified multiple times to filter on more than one Site ID.
+    - Filter Allocations by Site ID. Can be specified multiple times to filter on more than one Site ID.
   status:
     type: str
     description:
-    - Filter Allocations by Status.  Can be specified multiple times to filter on more than one Status.
+    - Filter Allocations by Status. Can be specified multiple times to filter on more than one Status.
   tenant_id:
     type: str
     description:

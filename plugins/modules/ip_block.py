@@ -22,7 +22,7 @@ options:
   description:
     type: str
     description:
-    - description parameter.
+    - Description of the IP Block
   id:
     type: str
     description:
@@ -34,7 +34,7 @@ options:
   name:
     type: str
     description:
-    - name parameter.
+    - Name of the IP Block
   prefix:
     type: str
     description:
@@ -46,21 +46,21 @@ options:
   protocol_version:
     type: str
     description:
-    - protocol_version parameter.
+    - Version of the ip network ipv4 or ipv6
     choices:
     - IPv4
     - IPv6
   routing_type:
     type: str
     description:
-    - routing_type parameter.
+    - Routing type of the IP Block
     choices:
     - Public
     - DatacenterOnly
   site_id:
     type: str
     description:
-    - site_id parameter.
+    - ID of the site
   state:
     type: str
     description:

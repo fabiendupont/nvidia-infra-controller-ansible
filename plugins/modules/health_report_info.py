@@ -10,30 +10,39 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.service_account_info
-short_description: Retrieve Service Account information
+module: nvidia.infra_controller.health_report_info
+short_description: Retrieve Health Report information
 description:
-- 'When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service
-  accounts, the Tenant entity is initialized as a
-
-  privileged Tenant with `targetedInstanceCreation` capability enabled.'
+- Machine Health Report contains information about the health of a Machine including user enforced overrides
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
-options: {}
+options:
+  id:
+    type: str
+    description:
+    - ID of the resource to retrieve.
+  machine_id:
+    type: str
+    description:
+    - 'ID path parameter: machine_id.'
+  source:
+    type: str
+    description:
+    - 'ID path parameter: source.'
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all Service Account resources
-  nvidia.infra_controller.service_account_info:
+- name: List all Health Report resources
+  nvidia.infra_controller.health_report_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific Service Account by ID
-  nvidia.infra_controller.service_account_info:
+- name: Get a specific Health Report by ID
+  nvidia.infra_controller.health_report_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -59,13 +68,15 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-
+id=dict(type='str'),
+machine_id=dict(type='str'),
+source=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/service-account/current',
-    'resource_item_path': '',
-    'id_param': 'id',
+    'resource_path': '/v2/org/{org}/nico/machine/{machineId}/health-report',
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}/health-report/{source}',
+    'id_param': 'source',
     'filter_fields': [],
 }
 

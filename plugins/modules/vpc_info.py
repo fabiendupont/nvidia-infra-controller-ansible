@@ -36,7 +36,7 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all VPCs. Input will be matched against name, description, labels and status fields
+    - Search for matches across all VPCs. Input will be matched against name, description, labels, and status fields
   site_id:
     type: str
     description:

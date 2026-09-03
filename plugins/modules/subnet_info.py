@@ -27,18 +27,18 @@ options:
   include_usage_stats:
     type: bool
     description:
-    - 'When true, each Subnet object includes usage statistic using the same structure as IP Block usage.
+    - 'When true, each Subnet object includes usage statistics using the same structure as IP Block usage.
 
-      Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a Subnets
-      consumes a single IP. In addition, 1 gateway and 1 broadcast IP address is reserved per Subnet.'
+      Prefix and IP usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a Subnet
+      consumes a single IP. In addition, one gateway and one broadcast IP address are reserved per Subnet.'
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, description and status fields
+    - Search for matches across all Subnets. Input will be matched against name, description, and status fields
   site_id:
     type: str
     description:
-    - Filter subnets by Site, required if vpcId query param is not specified
+    - Filter subnets by Site, required if the vpcId query parameter is not specified
   status:
     type: str
     description:

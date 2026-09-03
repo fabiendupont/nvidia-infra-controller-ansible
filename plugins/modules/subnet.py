@@ -23,7 +23,7 @@ options:
   description:
     type: str
     description:
-    - description parameter.
+    - Description of the Subnet
   id:
     type: str
     description:
@@ -31,19 +31,19 @@ options:
   ipv4_block_id:
     type: str
     description:
-    - ipv4_block_id parameter.
+    - ID of the derived Tenant IPv4 Block from an Allocation
   ipv6_block_id:
     type: str
     description:
-    - ipv6_block_id parameter.
+    - ID of the derived Tenant IPv6 Block from an Allocation
   name:
     type: str
     description:
-    - name parameter.
+    - Name of the Subnet
   prefix_length:
     type: int
     description:
-    - prefix_length parameter.
+    - Length of the prefix
   site_id:
     type: str
     description:
@@ -62,7 +62,7 @@ options:
   vpc_id:
     type: str
     description:
-    - vpc_id parameter.
+    - ID of the VPC containing the Subnet
   wait:
     type: bool
     description:

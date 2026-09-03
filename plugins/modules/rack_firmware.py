@@ -22,7 +22,7 @@ options:
   filter:
     type: dict
     description:
-    - Filter criteria for selecting racks in batch operations. If omitted or empty, all racks in the site are targeted.
+    - Filter that selects Racks targeted for firmware update
     suboptions:
       names:
         type: list
@@ -33,6 +33,22 @@ options:
     type: str
     description:
     - ID of the resource. When provided, targets a single resource.
+  override_readiness_check:
+    type: bool
+    description:
+    - 'When true, proceed even if one or more target components (or hosts
+
+      on the owning rack for rack-scoped components) are reported as not
+
+      ready by their persisted status. Intended for operator-supervised
+
+      maintenance.'
+  rule_id:
+    type: str
+    description:
+    - 'Optional Operation Rule UUID. When set, pins this firmware update to
+
+      the named rule and overrides Flow''s default rule resolution.'
   site_id:
     type: str
     description:
@@ -48,7 +64,10 @@ options:
       \   (currently NOT honored end-to-end: the NICo compute-firmware\n    path goes through SetFirmwareUpdateTimeWindow\
       \ + auto-update,\n    which has no per-target selection; the request is logged\n    and the whole bundle is applied.\
       \ Will be honored once\n    compute moves to UpdateComponentFirmware.)\nOmitted or empty means \"update everything in\
-      \ the bundle\"\n(the historical default). Unknown names are rejected.\nRequires `version` to be set."
+      \ the bundle\"\n(the historical default) for compute-tray-internal targets.\nUnknown names are rejected. Requires `version`\
+      \ to be set.\nThe special target `dpu`, valid only on compute trays,\nrequests DPU reprovisioning on the matched host.\
+      \ Unlike\nthe other targets, `dpu` is NOT covered by the\n\"omitted/empty means everything\" default \u2014 it must\
+      \ be\nlisted explicitly. `version` is ignored on the `dpu`\nbranch; the target firmware version comes from site\nconfiguration."
     elements: str
   version:
     type: str
@@ -90,6 +109,8 @@ filter=dict(type='dict', options=dict(
     names=dict(type='list', elements='str'),
 )),
 id=dict(type='str'),
+override_readiness_check=dict(type='bool'),
+rule_id=dict(type='str'),
 site_id=dict(type='str'),
 targets=dict(type='list', elements='str'),
 version=dict(type='str'),
@@ -99,7 +120,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/rack/firmware',
     'resource_item_path': '/v2/org/{org}/carbide/rack/{id}/firmware',
     'method': 'PATCH',
-    'body_fields': ['site_id', 'version', 'targets', 'filter'],
+    'body_fields': ['site_id', 'version', 'targets', 'rule_id', 'override_readiness_check', 'filter'],
     'query_fields': [],
 }
 

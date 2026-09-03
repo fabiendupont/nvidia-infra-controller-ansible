@@ -10,42 +10,27 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.ssh_key_group
-short_description: Manage SSH Key Group resources
+module: nvidia.infra_controller.health_report
+short_description: Manage Health Report resources
 description:
-- SSH Key Groups allow grouping several SSH Keys together so they can be synced to Sites and used to access the Serial Console
-  of Instances.
+- Machine Health Report contains information about the health of a Machine including user enforced overrides
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  description:
-    type: str
-    description:
-    - Description of the SSHKeyGroup
   id:
     type: str
     description:
     - ID of the resource. Used for lookup.
-  name:
+  machine_id:
     type: str
     description:
-    - Name of the SSHKeyGroup
-  site_ids:
-    type: list
-    description:
-    - List of Site objects
-    elements: str
-  ssh_key_group_id:
+    - 'ID path parameter: machine_id.'
+  source:
     type: str
     description:
-    - 'ID path parameter: ssh_key_group_id.'
-  ssh_key_ids:
-    type: list
-    description:
-    - List of SSHKeyID objects
-    elements: str
+    - 'ID path parameter: source.'
   state:
     type: str
     description:
@@ -53,10 +38,6 @@ options:
     choices:
     - present
     - absent
-  version:
-    type: str
-    description:
-    - Version of the SSH Key Group being modified must be provided
   wait:
     type: bool
     description:
@@ -69,21 +50,13 @@ options:
 
 EXAMPLES = r'''
 ---
-- name: Create a SSH Key Group
-  nvidia.infra_controller.ssh_key_group:
-    api_url: "{{ api_url }}"
-    api_token: "{{ api_token }}"
-    org: "{{ org }}"
-    state: present
-    name: "my-ssh-key-group"
-
-- name: Delete a SSH Key Group
-  nvidia.infra_controller.ssh_key_group:
+- name: Delete a Health Report
+  nvidia.infra_controller.health_report:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: absent
-    name: "my-ssh-key-group"
+    id: "{{ resource_id }}"
 '''
 
 RETURN = r'''
@@ -100,31 +73,27 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-description=dict(type='str'),
 id=dict(type='str'),
-name=dict(type='str'),
-site_ids=dict(type='list', elements='str'),
-ssh_key_group_id=dict(type='str'),
-ssh_key_ids=dict(type='list', elements='str'),
+machine_id=dict(type='str'),
+source=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
-version=dict(type='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/sshkeygroup',
-    'resource_item_path': '/v2/org/{org}/nico/sshkeygroup/{sshKeyGroupId}',
-    'id_param': 'sshKeyGroupId',
-    'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'site_ids', 'ssh_key_ids'],
-    'update_schema_fields': ['name', 'description', 'site_ids', 'ssh_key_ids', 'version'],
+    'resource_path': '/v2/org/{org}/nico/machine/{machineId}/health-report',
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}/health-report/{source}',
+    'id_param': 'source',
+    'name_field': None,
+    'create_schema_fields': [],
+    'update_schema_fields': [],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],
     'no_create': False,
     'delete_body_fields': [],
-    'version_field': 'version',
+    'version_field': None,
 }
 
 

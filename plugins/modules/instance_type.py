@@ -23,7 +23,7 @@ options:
   description:
     type: str
     description:
-    - description parameter.
+    - Description of the Instance Type
   id:
     type: str
     description:
@@ -35,7 +35,7 @@ options:
   labels:
     type: dict
     description:
-    - labels parameter.
+    - User-defined key-value labels for the Instance Type
   machine_association_id:
     type: str
     description:
@@ -43,7 +43,7 @@ options:
   machine_capabilities:
     type: list
     description:
-    - machine_capabilities parameter.
+    - List of Machine Capabilities to match
     elements: dict
     suboptions:
       capacity:
@@ -66,6 +66,10 @@ options:
         type: str
         description:
         - frequency parameter.
+      hardware_revision:
+        type: str
+        description:
+        - hardware_revision parameter.
       inactive_devices:
         type: list
         description:
@@ -98,12 +102,12 @@ options:
   machine_ids:
     type: list
     description:
-    - machine_ids parameter.
+    - ID of the Machine
     elements: str
   name:
     type: str
     description:
-    - name parameter.
+    - Name of the Instance Type
   site_id:
     type: str
     description:
@@ -169,6 +173,7 @@ machine_capabilities=dict(type='list', elements='dict', options=dict(
     count=dict(type='int'),
     device_type=dict(type='str'),
     frequency=dict(type='str'),
+    hardware_revision=dict(type='str'),
     inactive_devices=dict(type='list', elements='int'),
     name=dict(type='str'),
     threads=dict(type='int'),

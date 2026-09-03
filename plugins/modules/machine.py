@@ -63,7 +63,7 @@ options:
   labels:
     type: dict
     description:
-    - Machine labels will be overwritten, include existing labels to preserve them. Can be updated by Provider or Privileged
+    - Machine labels will be overwritten, include existing labels to preserve them. Can be updated by Provider or privileged
       Tenant.
   machine_id:
     type: str
@@ -72,17 +72,12 @@ options:
   maintenance_message:
     type: str
     description:
-    - Optional message describing the reason for moving Machine into maintenance mode. Can be updated by Provider or Privileged
+    - Optional message describing the reason for moving Machine into maintenance mode. Can be updated by Provider or privileged
       Tenant.
   online_repair:
     type: dict
     description:
-    - 'Enable or disable online repair of a Machine. Online repair facilitates repairing a Machine without the Tenant having
-      to release the Machine by deleting the Instance. When `enabled` is true, `policy` and `acknowledgments` are required
-      inside this object,
-
-      and `healthIssue` is required at the top level of the MachineUpdateRequest. When `enabled` is false, none of those fields
-      may be set.'
+    - Request to enter/exit online repair
     suboptions:
       acknowledgments:
         type: dict
@@ -100,7 +95,7 @@ options:
   set_maintenance_mode:
     type: bool
     description:
-    - Set to `true` to enable maintenance mode and to `false` to disable maintenance mode. Can be set by Provider or Privileged
+    - Set to `true` to enable maintenance mode and to `false` to disable maintenance mode. Can be set by Provider or privileged
       Tenant.
   state:
     type: str

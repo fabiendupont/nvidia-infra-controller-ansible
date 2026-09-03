@@ -26,7 +26,7 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name field
+    - Search for matches across all SSH Keys. Input will be matched against the name field
   ssh_key_group_id:
     type: str
     description:

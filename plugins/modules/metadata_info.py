@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.metadata_info
 short_description: Retrieve Metadata information
 description:
-- Metadata describes various system level attributes of the API service.
+- Metadata describes various system-level attributes of the API service.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:

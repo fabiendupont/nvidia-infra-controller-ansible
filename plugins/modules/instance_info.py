@@ -50,7 +50,7 @@ options:
   network_security_group_id:
     type: str
     description:
-    - Filter by NetworkSecurityGroup ID.  Can be specified multiple times to filter on more than one Network Security Group.
+    - Filter by Network Security Group ID. Can be specified multiple times to filter on more than one Network Security Group.
   operating_system_id:
     type: str
     description:
@@ -58,7 +58,7 @@ options:
   query:
     type: str
     description:
-    - Search for matches across all Sites. Input will be matched against name, description, status, and labels fields
+    - Search for matches across all Instances. Input will be matched against name, description, status, and labels fields
   site_id:
     type: str
     description:
