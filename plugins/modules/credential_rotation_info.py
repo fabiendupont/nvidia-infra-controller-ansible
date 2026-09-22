@@ -10,55 +10,45 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.operating_system_info
-short_description: Retrieve Operating System information
+module: nvidia.infra_controller.credential_rotation_info
+short_description: Retrieve Credential Rotation information
 description:
-- Operating Systems in NICo are typically iPXE scripts that are used to boot Machines.
+- Credential Rotation endpoints stage a site-wide credential rotation and report per-Site or per-device convergence
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  id:
+  credential_type:
     type: str
     description:
-    - ID of the resource to retrieve.
-  operating_system_id:
+    - Credential family to report.
+    choices:
+    - BMC
+    - HostUEFI
+    - DPUUEFI
+    - NVOS
+    - LockdownIKM
+  device_mac:
     type: str
     description:
-    - 'ID path parameter: operating_system_id.'
-  query:
-    type: str
-    description:
-    - Provide query to search for matches. Input will be matched against name, description and status fields
+    - Report only this device's convergence, matched by MAC.
   site_id:
     type: str
     description:
-    - Filter Operating Systems by Site ID.  Can be specified multiple times to filter on more than one ID.
-  status:
-    type: str
-    description:
-    - Filter Operating Systems by Status.  Can be specified multiple times to filter on more than one status.
-  type:
-    type: str
-    description:
-    - Filter Operating Systems by Type
-    choices:
-    - Image
-    - iPXE
-    - TemplatedIpxe
+    - ID of the Site to query.
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all Operating System resources
-  nvidia.infra_controller.operating_system_info:
+- name: List all Credential Rotation resources
+  nvidia.infra_controller.credential_rotation_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific Operating System by ID
-  nvidia.infra_controller.operating_system_info:
+- name: Get a specific Credential Rotation by ID
+  nvidia.infra_controller.credential_rotation_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -84,19 +74,16 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-id=dict(type='str'),
-operating_system_id=dict(type='str'),
-query=dict(type='str'),
+credential_type=dict(type='str', choices=['BMC', 'HostUEFI', 'DPUUEFI', 'NVOS', 'LockdownIKM']),
+device_mac=dict(type='str'),
 site_id=dict(type='str'),
-status=dict(type='str'),
-type=dict(type='str', choices=['Image', 'iPXE', 'TemplatedIpxe']),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/operating-system',
-    'resource_item_path': '/v2/org/{org}/nico/operating-system/{operatingSystemId}',
-    'id_param': 'operatingSystemId',
-    'filter_fields': ['site_id', 'type', 'status', 'query'],
+    'resource_path': '/v2/org/{org}/nico/credential/rotation',
+    'resource_item_path': '',
+    'id_param': 'id',
+    'filter_fields': ['site_id', 'credential_type', 'device_mac'],
 }
 
 

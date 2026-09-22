@@ -25,11 +25,13 @@ options:
   bmc_ip_address:
     type: str
     description:
-    - Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.
+    - Optional BMC IP address (IPv4 or IPv6). A non-empty address sets the value and pre-allocates a reserved IP for the BMC.
+      An empty string clears the value. Omission or null preserves the current value.
   bmc_mac_address:
     type: str
     description:
-    - MAC address of the Expected Machine's BMC (Baseboard Management Controller)
+    - The Expected Machine's BMC MAC address is immutable after creation. Omit this field, or provide another case/separator
+      spelling of the current MAC as a compatibility no-op.
   chassis_serial_number:
     type: str
     description:

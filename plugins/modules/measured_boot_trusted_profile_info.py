@@ -10,10 +10,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.ip_block_info
-short_description: Retrieve IP Block information
+module: nvidia.infra_controller.measured_boot_trusted_profile_info
+short_description: Retrieve Measured Boot Trusted Profile information
 description:
-- IP Block is a contiguous block of IP addresses defined by a prefix and prefix length.
+- Measured Boot Trusted Profile endpoints manage automatic measurement promotion approvals for system profiles at a Site
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
@@ -23,47 +23,22 @@ options:
     type: str
     description:
     - ID of the resource to retrieve.
-  include_usage_stats:
-    type: bool
-    description:
-    - Include IP Block usage stats in response
-  infrastructure_provider_id:
-    type: str
-    description:
-    - 'Filter IP Blocks by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org''s
-      membership.'
-  ip_block_id:
-    type: str
-    description:
-    - 'ID path parameter: ip_block_id.'
-  query:
-    type: str
-    description:
-    - Search for matches across all derived IP Blocks. Input will be matched against name, description, and status fields
   site_id:
     type: str
     description:
-    - Filter IP Blocks by Site ID
-  status:
-    type: str
-    description:
-    - Filter IP Blocks by Status
-  tenant_id:
-    type: str
-    description:
-    - 'Filter IP Blocks by Tenant ID. Deprecated: Tenant is now inferred from the org''s membership.'
+    - ID of the Site
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all IP Block resources
-  nvidia.infra_controller.ip_block_info:
+- name: List all Measured Boot Trusted Profile resources
+  nvidia.infra_controller.measured_boot_trusted_profile_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific IP Block by ID
-  nvidia.infra_controller.ip_block_info:
+- name: Get a specific Measured Boot Trusted Profile by ID
+  nvidia.infra_controller.measured_boot_trusted_profile_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -90,20 +65,14 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
-include_usage_stats=dict(type='bool'),
-infrastructure_provider_id=dict(type='str'),
-ip_block_id=dict(type='str'),
-query=dict(type='str'),
 site_id=dict(type='str'),
-status=dict(type='str'),
-tenant_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/ipblock/{ipBlockId}/derived',
-    'resource_item_path': '/v2/org/{org}/nico/ipblock/{ipBlockId}',
-    'id_param': 'ipBlockId',
-    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'site_id', 'status', 'include_usage_stats', 'query', 'status', 'query'],
+    'resource_path': '/v2/org/{org}/nico/measured-boot/trusted-profile',
+    'resource_item_path': '/v2/org/{org}/nico/measured-boot/trusted-profile/{id}',
+    'id_param': 'id',
+    'filter_fields': ['site_id'],
 }
 
 
