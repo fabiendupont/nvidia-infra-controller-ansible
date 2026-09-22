@@ -51,9 +51,9 @@ options:
         description:
         - type parameter.
         choices:
-        - compute
-        - switch
-        - powershelf
+        - Compute
+        - NVSwitch
+        - PowerShelf
   id:
     type: str
     description:
@@ -136,7 +136,7 @@ filter=dict(type='dict', options=dict(
     rack_id=dict(type='str'),
     rack_name=dict(type='str'),
     slot_id=dict(type='int'),
-    type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
+    type=dict(type='str', choices=['Compute', 'NVSwitch', 'PowerShelf']),
 )),
 id=dict(type='str'),
 override_readiness_check=dict(type='bool'),
