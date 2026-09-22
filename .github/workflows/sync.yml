@@ -101,9 +101,6 @@ jobs:
       - name: Unit tests
         run: make test
 
-      - name: Build collection
-        run: ansible-galaxy collection build
-
       - name: Commit, tag and push
         run: |
           git config user.name "github-actions[bot]"
@@ -115,3 +112,12 @@ jobs:
           Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
           git tag "${VERSION}" -m "Release ${VERSION}"
           git push origin main "${VERSION}"
+
+  publish:
+    name: Publish ${{ needs.check.outputs.version }}
+    needs: [check, sync]
+    uses: ./.github/workflows/_publish.yml
+    with:
+      version: ${{ needs.check.outputs.version }}
+    permissions:
+      contents: write

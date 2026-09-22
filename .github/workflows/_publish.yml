@@ -1,0 +1,43 @@
+---
+# Reusable workflow: build the collection tarball and publish a GitHub Release.
+# Called by release.yml (on manual tag push) and sync.yml (after automated commit).
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install ansible-core
+        run: pip install ansible-core
+
+      - name: Build collection
+        run: ansible-galaxy collection build --output-path dist/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.version }}" \
+            dist/nvidia-infra_controller-${{ inputs.version }}.tar.gz \
+            --title "v${{ inputs.version }}" \
+            --generate-notes
