@@ -8,16 +8,16 @@ on:
 
 jobs:
   check:
-    name: Find missing upstream releases
+    name: Find oldest missing upstream release
     runs-on: ubuntu-latest
     outputs:
-      versions: ${{ steps.missing.outputs.versions }}
+      version: ${{ steps.missing.outputs.version }}
       has_missing: ${{ steps.missing.outputs.has_missing }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Find all missing upstream releases
+      - name: Find oldest missing upstream release
         id: missing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,19 +32,18 @@ jobs:
             --json tagName --jq '.[].tagName | ltrimstr("v")' \
             | sort -Vu)
 
-          echo "Upstream versions: $(echo "${upstream}" | tr '\n' ' ')"
-          echo "Published releases: $(echo "${published}" | tr '\n' ' ')"
+          echo "Upstream: $(echo "${upstream}" | tr '\n' ' ')"
+          echo "Published: $(echo "${published}" | tr '\n' ' ')"
 
-          # All upstream versions not yet published, as a JSON array
-          versions=$(comm -23 \
+          # Oldest upstream version not yet published
+          version=$(comm -23 \
             <(echo "${upstream}") \
             <(echo "${published}") \
-            | python3 -c "import json,sys; print(json.dumps(sys.stdin.read().split()))")
+            | head -1)
 
-          echo "Missing versions: ${versions}"
-          echo "versions=${versions}" >> "$GITHUB_OUTPUT"
-
-          if [ "${versions}" != "[]" ]; then
+          if [ -n "${version}" ]; then
+            echo "Oldest missing: ${version}"
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
             echo "has_missing=true" >> "$GITHUB_OUTPUT"
           else
             echo "All upstream releases are published."
@@ -52,24 +51,20 @@ jobs:
           fi
 
   update:
-    name: Sync ${{ matrix.version }}
+    name: Sync ${{ needs.check.outputs.version }}
     needs: check
     if: needs.check.outputs.has_missing == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
-    strategy:
-      max-parallel: 1
-      matrix:
-        version: ${{ fromJson(needs.check.outputs.versions) }}
     env:
-      VERSION: ${{ matrix.version }}
+      VERSION: ${{ needs.check.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check for existing PR or branch
+      - name: Check for existing PR or stale branch
         id: existing
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +74,6 @@ jobs:
             echo "PR #${pr} already open for ${VERSION} -- skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            # Clean up stale remote branch from a previous failed run if present
             if git ls-remote --exit-code origin "refs/heads/sync/upstream-${VERSION}" > /dev/null 2>&1; then
               echo "Stale branch found, deleting."
               git push origin --delete "sync/upstream-${VERSION}"
