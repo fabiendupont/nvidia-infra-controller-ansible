@@ -165,8 +165,10 @@ jobs:
 
           Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
           git push origin "${branch}"
-          gh pr create \
+          pr_url=$(gh pr create \
             --title "Sync: upstream NICo release v${VERSION}" \
             --body-file /tmp/pr-body.md \
             --base main \
-            --head "${branch}"
+            --head "${branch}")
+          echo "PR created: ${pr_url}"
+          gh pr merge --auto --squash "${pr_url}"
