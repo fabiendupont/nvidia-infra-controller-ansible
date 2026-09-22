@@ -66,9 +66,9 @@ options:
     description:
     - Filter trays by type
     choices:
-    - Compute
-    - NVSwitch
-    - PowerShelf
+    - compute
+    - switch
+    - powershelf
 '''
 
 EXAMPLES = r'''
@@ -116,7 +116,7 @@ rack_id=dict(type='str'),
 rack_name=dict(type='str'),
 site_id=dict(type='str'),
 slot_id=dict(type='int'),
-type=dict(type='str', choices=['Compute', 'NVSwitch', 'PowerShelf']),
+type=dict(type='str', choices=['compute', 'switch', 'powershelf']),
 )
 
 RESOURCE_CONFIG = {

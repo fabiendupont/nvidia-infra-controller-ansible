@@ -24,10 +24,6 @@ options:
     type: str
     description:
     - ID of the resource to retrieve.
-  include_gpu_stats:
-    type: bool
-    description:
-    - Include a per-Site breakdown of GPU counts grouped by GPU type. Requires Provider Admin role.
   include_machine_stats:
     type: bool
     description:
@@ -35,7 +31,7 @@ options:
   infrastructure_provider_id:
     type: str
     description:
-    - 'Filter Sites by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org''s membership.'
+    - Filter Sites by Infrastructure Provider ID
   is_flow_enabled:
     type: bool
     description:
@@ -68,7 +64,7 @@ options:
   tenant_id:
     type: str
     description:
-    - 'Filter Sites by Tenant ID. Deprecated: Tenant is now inferred from the org''s membership.'
+    - Filter Sites by Tenant ID
 '''
 
 EXAMPLES = r'''
@@ -107,7 +103,6 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 ARGUMENT_SPEC = dict(
 id=dict(type='str'),
-include_gpu_stats=dict(type='bool'),
 include_machine_stats=dict(type='bool'),
 infrastructure_provider_id=dict(type='str'),
 is_flow_enabled=dict(type='bool'),
@@ -124,7 +119,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/site/{siteId}/status-history',
     'resource_item_path': '/v2/org/{org}/nico/site/{siteId}',
     'id_param': 'siteId',
-    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'status', 'is_native_networking_enabled', 'is_network_security_group_enabled', 'is_nv_link_partition_enabled', 'is_flow_enabled', 'include_machine_stats', 'include_gpu_stats', 'query'],
+    'filter_fields': ['infrastructure_provider_id', 'tenant_id', 'status', 'is_native_networking_enabled', 'is_network_security_group_enabled', 'is_nv_link_partition_enabled', 'is_flow_enabled', 'include_machine_stats', 'query'],
 }
 
 
