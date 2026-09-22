@@ -30,7 +30,8 @@ options:
   infrastructure_provider_id:
     type: str
     description:
-    - Filter IP Blocks by Infrastructure Provider ID
+    - 'Filter IP Blocks by Infrastructure Provider ID. Deprecated: Infrastructure Provider is now inferred from the org''s
+      membership.'
   ip_block_id:
     type: str
     description:
@@ -50,7 +51,7 @@ options:
   tenant_id:
     type: str
     description:
-    - Filter IP Blocks by Tenant ID
+    - 'Filter IP Blocks by Tenant ID. Deprecated: Tenant is now inferred from the org''s membership.'
 '''
 
 EXAMPLES = r'''
