@@ -22,12 +22,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # All upstream stable v2+ versions, sorted ascending
           upstream=$(gh api repos/NVIDIA/infra-controller/tags --paginate \
             --jq '.[] | select(.name | test("^v[2-9][0-9]*\\.[0-9]+\\.[0-9]+$")) | .name | ltrimstr("v")' \
             | sort -Vu)
 
-          # Our published GitHub release tags (strip leading v if any), same sort
           published=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
             --json tagName --jq '.[].tagName | ltrimstr("v")' \
             | sort -Vu)
@@ -35,7 +33,6 @@ jobs:
           echo "Upstream: $(echo "${upstream}" | tr '\n' ' ')"
           echo "Published: $(echo "${published}" | tr '\n' ' ')"
 
-          # Oldest upstream version not yet published
           version=$(comm -23 \
             <(echo "${upstream}") \
             <(echo "${published}") \
@@ -50,60 +47,37 @@ jobs:
             echo "has_missing=false" >> "$GITHUB_OUTPUT"
           fi
 
-  update:
+  sync:
     name: Sync ${{ needs.check.outputs.version }}
     needs: check
     if: needs.check.outputs.has_missing == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     env:
       VERSION: ${{ needs.check.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check for existing PR or stale branch
-        id: existing
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pr=$(gh pr list --head "sync/upstream-${VERSION}" --json number --jq '.[0].number')
-          if [ -n "${pr}" ]; then
-            echo "PR #${pr} already open for ${VERSION} -- skipping."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            if git ls-remote --exit-code origin "refs/heads/sync/upstream-${VERSION}" > /dev/null 2>&1; then
-              echo "Stale branch found, deleting."
-              git push origin --delete "sync/upstream-${VERSION}"
-            fi
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Set up Python
-        if: steps.existing.outputs.skip == 'false'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        if: steps.existing.outputs.skip == 'false'
-        run: pip install ansible-core pyyaml
+        run: pip install ansible-core ansible-lint pyyaml pytest
 
       - name: Download upstream spec
-        if: steps.existing.outputs.skip == 'false'
         run: |
           curl -fsSL \
             "https://raw.githubusercontent.com/NVIDIA/infra-controller/v${VERSION}/rest-api/openapi/spec.yaml" \
             -o /tmp/spec.yaml
 
       - name: Regenerate modules
-        if: steps.existing.outputs.skip == 'false'
         run: python scripts/generate.py --spec /tmp/spec.yaml --output plugins/modules
 
       - name: Bump collection version and README
-        if: steps.existing.outputs.skip == 'false'
         run: |
           python3 -c "
           import re, os
@@ -119,50 +93,25 @@ jobs:
               open(path, 'w').write(txt)
           "
 
-      - name: Write PR body
-        if: steps.existing.outputs.skip == 'false'
+      - name: Lint
         run: |
-          python3 -c "
-          import os
-          v = os.environ['VERSION']
-          body = (
-              f'Automated sync from [NVIDIA/infra-controller v{v}]'
-              f'(https://github.com/NVIDIA/infra-controller/releases/tag/v{v}).\n\n'
-              '## Changes\n'
-              '- Regenerated all modules from upstream OpenAPI spec\n'
-              f'- Bumped collection version to \`{v}\`\n\n'
-              '## Before merging\n'
-              '- [ ] Review new and modified modules for breaking changes\n'
-              '- [ ] Run \`make test\` locally if needed\n\n'
-              '## After merging\n'
-              'Push the release tag to publish:\n'
-              '\`\`\`\n'
-              f'git tag {v} -m \"Release {v}\"\n'
-              f'git push origin {v}\n'
-              '\`\`\`\n'
-          )
-          open('/tmp/pr-body.md', 'w').write(body)
-          "
+          make lint
+          ansible-lint plugins/
 
-      - name: Commit and open PR
-        if: steps.existing.outputs.skip == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Unit tests
+        run: make test
+
+      - name: Build collection
+        run: ansible-galaxy collection build
+
+      - name: Commit, tag and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          branch="sync/upstream-${VERSION}"
-          git checkout -b "${branch}"
           git add galaxy.yml README.md plugins/modules/
           git diff --cached --stat
           git commit -s -m "Regenerate modules for upstream release v${VERSION}
 
           Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
-          git push origin "${branch}"
-          pr_url=$(gh pr create \
-            --title "Sync: upstream NICo release v${VERSION}" \
-            --body-file /tmp/pr-body.md \
-            --base main \
-            --head "${branch}")
-          echo "PR created: ${pr_url}"
-          gh pr merge --auto --squash "${pr_url}"
+          git tag "${VERSION}" -m "Release ${VERSION}"
+          git push origin main "${VERSION}"
