@@ -1,6 +1,6 @@
 # NVIDIA Infra Controller Ansible Collection
 
-![Collection version](https://img.shields.io/badge/version-2.1.1-blue)
+![Collection version](https://img.shields.io/badge/version-2.1.2-blue)
 ![Spec version](https://img.shields.io/badge/spec-2.0.0-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![Ansible](https://img.shields.io/badge/ansible-%3E%3D2.14-red)
@@ -38,7 +38,7 @@ ansible-galaxy collection install git+https://github.com/fabiendupont/nvidia-inf
 ```bash
 cd nvidia-infra-controller-ansible
 ansible-galaxy collection build
-ansible-galaxy collection install nvidia-infra_controller-2.1.1.tar.gz
+ansible-galaxy collection install nvidia-infra_controller-2.1.2.tar.gz
 ```
 
 ## Authentication
