@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 Fabien Dupont
 # SPDX-License-Identifier: Apache-2.0
 
-SPEC_REPO := NVIDIA/infra-controller
+SPEC_REPO := dsx-ai-factory/infra-controller
 SPEC_REF ?= v2.0.0-pr
 SPEC_URL := https://raw.githubusercontent.com/$(SPEC_REPO)/$(SPEC_REF)/rest-api/openapi/spec.yaml
 SPEC_DIR := .spec

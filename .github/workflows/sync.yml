@@ -22,7 +22,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          upstream=$(gh api repos/NVIDIA/infra-controller/tags --paginate \
+          upstream=$(gh api repos/dsx-ai-factory/infra-controller/tags --paginate \
             --jq '.[] | select(.name | test("^v[2-9][0-9]*\\.[0-9]+\\.[0-9]+$")) | .name | ltrimstr("v")' \
             | sort -Vu)
 
@@ -71,7 +71,7 @@ jobs:
       - name: Download upstream spec
         run: |
           curl -fsSL \
-            "https://raw.githubusercontent.com/NVIDIA/infra-controller/v${VERSION}/rest-api/openapi/spec.yaml" \
+            "https://raw.githubusercontent.com/dsx-ai-factory/infra-controller/v${VERSION}/rest-api/openapi/spec.yaml" \
             -o /tmp/spec.yaml
 
       - name: Regenerate modules

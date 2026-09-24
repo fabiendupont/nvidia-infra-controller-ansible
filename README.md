@@ -6,7 +6,7 @@
 ![Ansible](https://img.shields.io/badge/ansible-%3E%3D2.14-red)
 
 `nvidia.infra_controller` is an Ansible collection for automating
-[NVIDIA Infra Controller](https://github.com/NVIDIA/infra-controller) (NICo)
+[NVIDIA Infra Controller](https://github.com/dsx-ai-factory/infra-controller) (NICo)
 infrastructure — GPU bare-metal provisioning, VPC networking, instance lifecycle,
 firmware management, and more. All modules are generated directly from the NICo
 OpenAPI specification and track the upstream API version exactly.
@@ -383,7 +383,7 @@ make lint
 ```
 
 The generator reads the OpenAPI spec from the upstream
-[NVIDIA/infra-controller](https://github.com/NVIDIA/infra-controller) repository,
+[dsx-ai-factory/infra-controller](https://github.com/dsx-ai-factory/infra-controller) repository,
 resolves `$ref` references, groups operations by tag, and produces one Python file
 per resource. Hand-written code lives in `plugins/module_utils/` and is
 not regenerated.
