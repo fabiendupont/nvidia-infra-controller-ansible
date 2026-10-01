@@ -33,40 +33,6 @@ options:
     description:
     - "Deprecated; inferred from the caller's org Infrastructure Provider\nwhen omitted. When provided, the value must match\
       \ the org's\nInfrastructure Provider \u2014 mismatched values are rejected with 400."
-  site_capabilities:
-    type: list
-    description:
-    - 'Provider Admin replace payload for TargetedInstanceCreation configuration. Required to be non-empty when sent.
-
-
-      PATCH uses replace semantics: previously configured per-site overrides whose siteId is omitted from the new payload
-      are cleared.
-
-
-      Server validation rules:
-
-      - must contain at least one entry
-
-      - must contain exactly one entry with omitted or empty siteIds
-
-      - must not repeat any siteId across entries
-
-      - every provided siteId must be a valid Site UUID
-
-      - every provided siteId must identify a Site associated with the Tenant and owned by the Tenant Account''s Infrastructure
-      Provider; otherwise the server rejects the request with 400'
-    elements: dict
-    suboptions:
-      site_ids:
-        type: list
-        description:
-        - site_ids parameter.
-        elements: str
-      targeted_instance_creation:
-        type: bool
-        description:
-        - targeted_instance_creation parameter.
-        required: true
   state:
     type: str
     description:
@@ -74,10 +40,6 @@ options:
     choices:
     - present
     - absent
-  tenant_contact_id:
-    type: str
-    description:
-    - Tenant Admin invite acceptance; must match the requesting user
   tenant_org:
     type: str
     description:
@@ -128,12 +90,7 @@ ARGUMENT_SPEC = dict(
 account_id=dict(type='str'),
 id=dict(type='str'),
 infrastructure_provider_id=dict(type='str'),
-site_capabilities=dict(type='list', elements='dict', options=dict(
-    site_ids=dict(type='list', elements='str'),
-    targeted_instance_creation=dict(type='bool', required=True),
-)),
 state=dict(type='str', choices=['present', 'absent']),
-tenant_contact_id=dict(type='str'),
 tenant_org=dict(type='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
@@ -145,7 +102,7 @@ RESOURCE_CONFIG = {
     'id_param': 'accountId',
     'name_field': None,
     'create_schema_fields': ['infrastructure_provider_id', 'tenant_org'],
-    'update_schema_fields': ['tenant_contact_id', 'site_capabilities'],
+    'update_schema_fields': [],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

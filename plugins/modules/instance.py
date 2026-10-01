@@ -103,11 +103,9 @@ options:
     type: list
     description:
     - 'Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork`
-      is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId`
-      or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently
-      and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is
-      not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true
-      this list MUST be empty.'
+      is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over
+      Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive
+      with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.'
     elements: dict
     suboptions:
       device:
@@ -126,11 +124,6 @@ options:
         type: str
         description:
         - ip_address parameter.
-      ip_families:
-        type: list
-        description:
-        - ip_families parameter.
-        elements: str
       is_physical:
         type: bool
         description:
@@ -143,10 +136,6 @@ options:
         type: int
         description:
         - virtual_function_id parameter.
-      vpc_id:
-        type: str
-        description:
-        - vpc_id parameter.
       vpc_prefix_id:
         type: str
         description:
@@ -236,8 +225,8 @@ options:
     type: list
     description:
     - IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified
-      when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not
-      include the primary `vpcId`.
+      when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the
+      primary `vpcId`.
     elements: str
   ssh_key_group_ids:
     type: list
@@ -340,11 +329,9 @@ interfaces=dict(type='list', elements='dict', options=dict(
     device_instance=dict(type='int'),
     inline_routing_profile=dict(type='str'),
     ip_address=dict(type='str'),
-    ip_families=dict(type='list', elements='str'),
     is_physical=dict(type='bool'),
     subnet_id=dict(type='str'),
     virtual_function_id=dict(type='int'),
-    vpc_id=dict(type='str'),
     vpc_prefix_id=dict(type='str'),
 )),
 ipxe_script=dict(type='str'),
