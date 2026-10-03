@@ -26,7 +26,9 @@ options:
   infrastructure_provider_id:
     type: str
     description:
-    - Filter by Infrastructure Provider ID
+    - 'Filter by Infrastructure Provider ID. Deprecated: Instances will no longer be filtered by Infrastructure Provider;
+      results are scoped to the org''s Tenant. Use the siteId parameter to scope results to a specific Infrastructure Provider''s
+      Sites.'
   instance_id:
     type: str
     description:

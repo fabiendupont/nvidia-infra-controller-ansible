@@ -27,9 +27,9 @@ options:
   include_usage_stats:
     type: bool
     description:
-    - When true, each VPC Prefix object includes usage statistics using the same structure as IP Block usage. Prefix and IP
-      usage data is derived by evaluating associated Ethernet interfaces. Each Interface associated with a VPC Prefix consumes
-      a `/31` prefix.
+    - When true, each VPC Prefix with IPv4 includes IPv4 usage statistics using the same structure as IP Block usage. Usage
+      is derived from associated Ethernet interfaces and their IPv4 addresses. IP usage counts two addresses per interface,
+      while prefix usage counts each distinct `/31` containing an assigned IPv4 address.
   query:
     type: str
     description:

@@ -10,31 +10,38 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.task_run
-short_description: Manage Task Run resources
+module: nvidia.infra_controller.machine_validation
+short_description: Manage Machine Validation resources
 description:
-- A Task Run is a phased, policy-gated execution of one operation across many Racks. A Task Run narrows a candidate set of
-  Racks with an optional selector, divides the selected Racks into phases, and drives one execution target per Rack; each
-  target in turn drives at most one Task. Safety gates pause the Task Run when failures exceed a threshold, and phase gates
-  hold each phase until an operator advances it. This tag exposes creation, retrieval, target listing, and the pause / resume
-  / advance / cancel lifecycle actions; drill into per-Rack execution detail via the Task tag using each target's `taskId`.
+- Machine Validation is the mechanism through which a series of validation tests are executed against a Machine verify its
+  integrity. The tests are run for each Machine on ingestion, they can also be run on-demand.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
+  allowed_tests:
+    type: list
+    description:
+    - Validation test names allowed for this run.
+    elements: str
+  contexts:
+    type: list
+    description:
+    - Contexts used to select validation tests.
+    elements: str
   id:
     type: str
     description:
     - ID of the resource. Used for lookup.
-  reason:
+  machine_id:
     type: str
     description:
-    - Optional free-form reason recorded with the cancellation.
-  site_id:
-    type: str
+    - 'ID path parameter: machine_id.'
+  run_unverified_tests:
+    type: bool
     description:
-    - ID of the Site that owns the Task Run.
+    - Whether unverified validation tests may run.
   state:
     type: str
     description:
@@ -42,6 +49,11 @@ options:
     choices:
     - present
     - absent
+  tags:
+    type: list
+    description:
+    - Tags used to select validation tests.
+    elements: str
   wait:
     type: bool
     description:
@@ -54,21 +66,21 @@ options:
 
 EXAMPLES = r'''
 ---
-- name: Create a Task Run
-  nvidia.infra_controller.task_run:
+- name: Create a Machine Validation
+  nvidia.infra_controller.machine_validation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: present
-    name: "my-task-run"
+    name: "my-machine-validation"
 
-- name: Delete a Task Run
-  nvidia.infra_controller.task_run:
+- name: Delete a Machine Validation
+  nvidia.infra_controller.machine_validation:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
     state: absent
-    name: "my-task-run"
+    name: "my-machine-validation"
 '''
 
 RETURN = r'''
@@ -85,20 +97,23 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
+allowed_tests=dict(type='list', elements='str'),
+contexts=dict(type='list', elements='str'),
 id=dict(type='str'),
-reason=dict(type='str'),
-site_id=dict(type='str'),
+machine_id=dict(type='str'),
+run_unverified_tests=dict(type='bool'),
 state=dict(type='str', choices=['present', 'absent']),
+tags=dict(type='list', elements='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/task/run/{id}/cancel',
-    'resource_item_path': '/v2/org/{org}/nico/task/run/{id}',
+    'resource_path': '/v2/org/{org}/nico/machine/{machineId}/validation/result',
+    'resource_item_path': '',
     'id_param': 'id',
     'name_field': None,
-    'create_schema_fields': ['site_id', 'reason'],
+    'create_schema_fields': ['tags', 'allowed_tests', 'run_unverified_tests', 'contexts'],
     'update_schema_fields': [],
     'scope_fields': [],
     'ready_statuses': ['Ready'],

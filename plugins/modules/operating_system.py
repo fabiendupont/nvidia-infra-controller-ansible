@@ -63,7 +63,66 @@ options:
   ipxe_script:
     type: str
     description:
-    - iPXE script or URL, only applicable for iPXE-based OS. Cannot be specified if imageUrl is specified
+    - 'Deprecated: raw iPXE Operating Systems are superseded by Templated iPXE (ipxeTemplateId). iPXE script or URL, only
+      applicable for iPXE-based OS. Cannot be specified if imageUrl is specified.'
+  ipxe_template_artifacts:
+    type: list
+    description:
+    - Artifacts (kernel, initrd, ISO, ...) for the iPXE OS definition (Templated iPXE only).
+    elements: dict
+    suboptions:
+      auth_token:
+        type: str
+        description:
+        - auth_token parameter.
+      auth_type:
+        type: str
+        description:
+        - auth_type parameter.
+      cache_strategy:
+        type: str
+        description:
+        - cache_strategy parameter.
+        choices:
+        - CacheAsNeeded
+        - LocalOnly
+        - CachedOnly
+        - RemoteOnly
+      name:
+        type: str
+        description:
+        - name parameter.
+        required: true
+      sha:
+        type: str
+        description:
+        - sha parameter.
+      url:
+        type: str
+        description:
+        - url parameter.
+        required: true
+  ipxe_template_id:
+    type: str
+    description:
+    - ID of the iPXE template to use; identifies a Templated iPXE Operating System. Mutually exclusive with ipxeScript and
+      imageUrl.
+  ipxe_template_parameters:
+    type: list
+    description:
+    - Parameters passed to the iPXE template (Templated iPXE only).
+    elements: dict
+    suboptions:
+      name:
+        type: str
+        description:
+        - name parameter.
+        required: true
+      value:
+        type: str
+        description:
+        - value parameter.
+        required: true
   is_active:
     type: bool
     description:
@@ -71,7 +130,7 @@ options:
   is_cloud_init:
     type: bool
     description:
-    - Specified when the Operating System is cloud-init based
+    - 'Deprecated and ignored: whether the Operating System is cloud-init based. Value now derived from `userData`.'
   name:
     type: str
     description:
@@ -95,7 +154,9 @@ options:
   site_ids:
     type: list
     description:
-    - Specify only one Site if an Operating System is image-based; more than one Site is not supported.
+    - Target Site for the Operating System. For image-based and Templated iPXE Operating Systems exactly one Site is required,
+      even though this field is an array. The list is fixed at creation and cannot be changed on update. Not applicable to
+      raw iPXE OS.
     elements: str
   state:
     type: str
@@ -166,6 +227,19 @@ image_sha=dict(type='str'),
 image_url=dict(type='str'),
 infrastructure_provider_id=dict(type='str'),
 ipxe_script=dict(type='str'),
+ipxe_template_artifacts=dict(type='list', elements='dict', options=dict(
+    auth_token=dict(type='str'),
+    auth_type=dict(type='str'),
+    cache_strategy=dict(type='str', choices=['CacheAsNeeded', 'LocalOnly', 'CachedOnly', 'RemoteOnly']),
+    name=dict(type='str', required=True),
+    sha=dict(type='str'),
+    url=dict(type='str', required=True),
+)),
+ipxe_template_id=dict(type='str'),
+ipxe_template_parameters=dict(type='list', elements='dict', options=dict(
+    name=dict(type='str', required=True),
+    value=dict(type='str', required=True),
+)),
 is_active=dict(type='bool'),
 is_cloud_init=dict(type='bool'),
 name=dict(type='str'),
@@ -186,8 +260,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/operating-system/{operatingSystemId}',
     'id_param': 'operatingSystemId',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'infrastructure_provider_id', 'tenant_id', 'site_ids', 'ipxe_script', 'image_url', 'image_sha', 'image_auth_type', 'image_auth_token', 'image_disk', 'root_fs_id', 'root_fs_label', 'phone_home_enabled', 'user_data', 'is_cloud_init', 'allow_override'],
-    'update_schema_fields': ['name', 'description', 'ipxe_script', 'image_url', 'image_sha', 'image_auth_type', 'image_auth_token', 'image_disk', 'root_fs_id', 'root_fs_label', 'phone_home_enabled', 'user_data', 'is_cloud_init', 'allow_override', 'is_active', 'deactivation_note'],
+    'create_schema_fields': ['name', 'description', 'infrastructure_provider_id', 'tenant_id', 'site_ids', 'ipxe_script', 'image_url', 'image_sha', 'image_auth_type', 'image_auth_token', 'image_disk', 'root_fs_id', 'root_fs_label', 'phone_home_enabled', 'user_data', 'is_cloud_init', 'allow_override', 'ipxe_template_id', 'ipxe_template_parameters', 'ipxe_template_artifacts'],
+    'update_schema_fields': ['name', 'description', 'ipxe_script', 'image_url', 'image_sha', 'image_auth_type', 'image_auth_token', 'image_disk', 'root_fs_id', 'root_fs_label', 'phone_home_enabled', 'user_data', 'is_cloud_init', 'allow_override', 'is_active', 'deactivation_note', 'ipxe_template_id', 'ipxe_template_parameters', 'ipxe_template_artifacts'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

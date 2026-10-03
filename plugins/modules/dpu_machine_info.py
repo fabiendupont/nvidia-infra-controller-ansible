@@ -10,45 +10,41 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: nvidia.infra_controller.task_info
-short_description: Retrieve Task information
+module: nvidia.infra_controller.dpu_machine_info
+short_description: Retrieve DPU Machine information
 description:
-- Task represents an asynchronous, site-scoped operation (for example firmware update, power state change, or rack bring-up).
-  Tasks are created when operations run against Racks, Trays, or other components. Endpoints in this tag retrieve or cancel
-  a Task by ID; list Tasks for a Rack or Tray under the Rack and Tray tags.
+- A DPU (Data Processing Unit) is a programmable network device installed in a Machine that runs its own operating system,
+  so NICo tracks each DPU as a Machine of its own alongside the host Machine it is attached to. NICo provisions the DPU and
+  uses it to enforce network isolation and Machine trust for the host, including when that host moves between Tenants.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  active_only:
-    type: bool
+  dpu_machine_id:
+    type: str
     description:
-    - Restrict results to non-terminal Tasks.
+    - 'ID path parameter: dpu_machine_id.'
   id:
     type: str
     description:
     - ID of the resource to retrieve.
-  include_report:
-    type: bool
-    description:
-    - Include the per-task execution report on each returned Task.
   site_id:
     type: str
     description:
-    - ID of the Site whose Tasks are returned.
+    - ID of the Site
 '''
 
 EXAMPLES = r'''
 ---
-- name: List all Task resources
-  nvidia.infra_controller.task_info:
+- name: List all DPU Machine resources
+  nvidia.infra_controller.dpu_machine_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
 
-- name: Get a specific Task by ID
-  nvidia.infra_controller.task_info:
+- name: Get a specific DPU Machine by ID
+  nvidia.infra_controller.dpu_machine_info:
     api_url: "{{ api_url }}"
     api_token: "{{ api_token }}"
     org: "{{ org }}"
@@ -74,17 +70,16 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-active_only=dict(type='bool'),
+dpu_machine_id=dict(type='str'),
 id=dict(type='str'),
-include_report=dict(type='bool'),
 site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/task/{id}/cancel',
-    'resource_item_path': '/v2/org/{org}/nico/task/{id}',
-    'id_param': 'id',
-    'filter_fields': ['site_id', 'active_only', 'include_report'],
+    'resource_path': '/v2/org/{org}/nico/dpu',
+    'resource_item_path': '/v2/org/{org}/nico/dpu/{dpuMachineId}',
+    'id_param': 'dpuMachineId',
+    'filter_fields': ['site_id'],
 }
 
 
