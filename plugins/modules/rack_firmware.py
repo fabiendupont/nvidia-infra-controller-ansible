@@ -19,14 +19,6 @@ author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  authentication_data:
-    type: dict
-    description:
-    - 'Optional, write-only authentication data for firmware downloads.
-
-      Not supported for DPU-only updates or by the legacy NICo compute
-
-      firmware controller.'
   filter:
     type: dict
     description:
@@ -113,7 +105,6 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-authentication_data=dict(type='dict'),
 filter=dict(type='dict', options=dict(
     names=dict(type='list', elements='str'),
 )),
@@ -129,7 +120,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/rack/firmware',
     'resource_item_path': '/v2/org/{org}/carbide/rack/{id}/firmware',
     'method': 'PATCH',
-    'body_fields': ['site_id', 'version', 'targets', 'authentication_data', 'rule_id', 'override_readiness_check', 'filter'],
+    'body_fields': ['site_id', 'version', 'targets', 'rule_id', 'override_readiness_check', 'filter'],
     'query_fields': [],
 }
 

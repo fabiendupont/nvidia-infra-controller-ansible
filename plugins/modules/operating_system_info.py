@@ -46,7 +46,6 @@ options:
     choices:
     - Image
     - iPXE
-    - TemplatedIpxe
 '''
 
 EXAMPLES = r'''
@@ -89,7 +88,7 @@ operating_system_id=dict(type='str'),
 query=dict(type='str'),
 site_id=dict(type='str'),
 status=dict(type='str'),
-type=dict(type='str', choices=['Image', 'iPXE', 'TemplatedIpxe']),
+type=dict(type='str', choices=['Image', 'iPXE']),
 )
 
 RESOURCE_CONFIG = {
