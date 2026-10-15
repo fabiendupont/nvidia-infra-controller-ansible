@@ -78,6 +78,11 @@ options:
     type: str
     description:
     - NvOS username for the Expected Switch
+  nvos_mac_addresses:
+    type: list
+    description:
+    - MAC addresses of the Expected Switch's NvOS management interfaces
+    elements: str
   rack_id:
     type: str
     description:
@@ -162,6 +167,7 @@ model=dict(type='str'),
 name=dict(type='str'),
 nv_os_password=dict(type='str'),
 nv_os_username=dict(type='str'),
+nvos_mac_addresses=dict(type='list', elements='str'),
 rack_id=dict(type='str'),
 site_id=dict(type='str'),
 slot_id=dict(type='int'),
@@ -177,8 +183,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/expected-switch/{expectedSwitchId}',
     'id_param': 'expectedSwitchId',
     'name_field': 'name',
-    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'create_schema_fields': ['site_id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'nvos_mac_addresses', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'switch_serial_number', 'nv_os_username', 'nv_os_password', 'nvos_mac_addresses', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'labels'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],
