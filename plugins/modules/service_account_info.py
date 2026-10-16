@@ -13,9 +13,10 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.service_account_info
 short_description: Retrieve Service Account information
 description:
-- When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. Privileged Tenant
-  behavior (for example, creating Instances by Machine ID) is determined by `siteCapabilities` on a Ready Tenant Account,
-  not by tenant-level configuration.
+- 'When the API service is configured in Service Account mode, API users can act as both Provider and Tenant. For service
+  accounts, the Tenant entity is initialized as a
+
+  privileged Tenant with `targetedInstanceCreation` capability enabled.'
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:

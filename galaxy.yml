@@ -3,7 +3,7 @@
 
 namespace: nvidia
 name: infra_controller
-version: 2.1.5
+version: 2.0.9
 readme: README.md
 authors:
   - Fabien Dupont
