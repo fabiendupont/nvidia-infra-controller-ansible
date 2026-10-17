@@ -37,7 +37,15 @@ options:
   operation_code:
     type: str
     description:
-    - Operation code within the operation type (e.g. `power_on`).
+    - 'Operation code within the operation type. For `PowerControl`, accepted
+
+      values are `power_on`, `force_power_on`, `power_off`, `force_power_off`,
+
+      `restart`, `force_restart`, `warm_reset`, and `cold_reset`. For
+
+      `FirmwareControl`, accepted values are `upgrade`, `downgrade`, and
+
+      `rollback`. The server validates the code against the selected type.'
   operation_type:
     type: str
     description:
@@ -48,11 +56,17 @@ options:
   rule_definition:
     type: dict
     description:
-    - 'Executable definition of a rule. Mirrors Flow''s wire schema 1:1 so existing
+    - 'Executable definition of a rule. Structurally identical to Flow''s own rule
 
-      YAML rule files can be converted to JSON without any key renaming
+      schema, so an existing YAML rule file maps across field for field. The
 
-      (nested fields use `snake_case`).'
+      fields declared here use `camelCase` (`componentType`, `mainOperation`,
+
+      `pollInterval`) rather than the `snake_case` of Flow''s YAML; keys inside
+
+      the free-form `parameters` map pass through unchanged and stay
+
+      `snake_case` (`expected_status`, `component_types`).'
     suboptions:
       steps:
         type: list

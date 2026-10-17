@@ -53,16 +53,38 @@ options:
     type: str
     description:
     - ID of the default NVLink Logical Partition that GPUs for all Instances in the VPC will attach to
+  power_resource_group:
+    type: str
+    description:
+    - Power resource group to associate with the VPC. A non-empty value requires the Site's `dpsPowerManagement` capability
+      to be `true`.
   routing_profile:
     type: str
     description:
     - Specify routing profile for the VPC. Only supported when `networkVirtualizationType` is set to `FNN`, or when `networkVirtualizationType`
       is omitted and Site has Native Networking enabled. Requires Tenant to have elevated privilege. Current accepted values
       are `privileged-internal`, `internal`, and `external`.
+  routing_profile_overrides:
+    type: str
+    description:
+    - Routing-profile properties to overlay on the resolved named profile. Only supported for FNN VPCs and requires `TargetedInstanceCreation`
+      to be effective for the Tenant at the VPC's Site. `routingProfile` may be omitted when the Site and Tenant configuration
+      select a named profile.
   site_id:
     type: str
     description:
     - ID of the Site where the VPC should be created
+  slaac_enabled:
+    type: bool
+    description:
+    - When true, Core allocates a `/64` to each instance interface that includes IPv6 and retains the prefix without assigning
+      a concrete IPv6 host address. It is supported only for FNN VPCs and fixed during creation. False or omission disables
+      SLAAC. Before persistence, REST requires `vpcSlaac` in the latest successfully stored configuration inventory for the
+      selected Site. Periodic Site inventory reports whether Core supports this feature, so the stored value can lag a Core
+      rollout. False or missing `vpcSlaac` returns 412 before REST persistence or workflow dispatch. This flag does not verify
+      DPU agent versions. When a new API server release is deployed, DPU agents roll forward, and instance network configuration
+      may fail transiently until eligible agents converge. NICo does not yet configure router advertisements (RAs); that support
+      is tracked by https://github.com/NVIDIA/infra-controller/issues/2398.
   state:
     type: str
     description:
@@ -128,8 +150,11 @@ name=dict(type='str'),
 network_security_group_id=dict(type='str'),
 network_virtualization_type=dict(type='str', choices=['ETHERNET_VIRTUALIZER', 'FNN', 'FLAT']),
 nv_link_logical_partition_id=dict(type='str'),
+power_resource_group=dict(type='str'),
 routing_profile=dict(type='str'),
+routing_profile_overrides=dict(type='str'),
 site_id=dict(type='str'),
+slaac_enabled=dict(type='bool'),
 state=dict(type='str', choices=['present', 'absent']),
 vni=dict(type='int'),
 vpc_id=dict(type='str'),
@@ -142,8 +167,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/vpc/{vpcId}',
     'id_param': 'vpcId',
     'name_field': 'name',
-    'create_schema_fields': ['id', 'name', 'description', 'site_id', 'network_virtualization_type', 'routing_profile', 'network_security_group_id', 'vni', 'nv_link_logical_partition_id', 'labels'],
-    'update_schema_fields': ['name', 'description', 'network_security_group_id', 'nv_link_logical_partition_id', 'labels'],
+    'create_schema_fields': ['id', 'name', 'description', 'site_id', 'network_virtualization_type', 'slaac_enabled', 'routing_profile', 'routing_profile_overrides', 'power_resource_group', 'network_security_group_id', 'vni', 'nv_link_logical_partition_id', 'labels'],
+    'update_schema_fields': ['name', 'description', 'network_security_group_id', 'nv_link_logical_partition_id', 'routing_profile_overrides', 'power_resource_group', 'labels'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

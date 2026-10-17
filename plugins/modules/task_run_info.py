@@ -13,12 +13,11 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.task_run_info
 short_description: Retrieve Task Run information
 description:
-- A Task Run is a phased, policy-gated execution of one operation (currently firmware) across many Racks. A Task Run narrows
-  a candidate set of Racks with an optional selector, divides the selected Racks into phases, and drives one execution target
-  per Rack; each target in turn drives at most one Task. Safety gates pause the Task Run when failures exceed a threshold,
-  and phase gates hold each phase until an operator advances it. This tag exposes creation, retrieval, target listing, and
-  the pause / resume / advance / cancel lifecycle actions; drill into per-Rack execution detail via the Task tag using each
-  target's `taskId`.
+- A Task Run is a phased, policy-gated execution of one operation across many Racks. A Task Run narrows a candidate set of
+  Racks with an optional selector, divides the selected Racks into phases, and drives one execution target per Rack; each
+  target in turn drives at most one Task. Safety gates pause the Task Run when failures exceed a threshold, and phase gates
+  hold each phase until an operator advances it. This tag exposes creation, retrieval, target listing, and the pause / resume
+  / advance / cancel lifecycle actions; drill into per-Rack execution detail via the Task tag using each target's `taskId`.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
