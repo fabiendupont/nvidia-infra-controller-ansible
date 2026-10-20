@@ -26,10 +26,6 @@ options:
     - Modify Site capabilities. Can only be updated by Provider. Partial update allowed, only specify capabilities that should
       be updated.
     suboptions:
-      dps_power_management:
-        type: bool
-        description:
-        - dps_power_management parameter.
       flow:
         type: bool
         description:
@@ -171,7 +167,6 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 ARGUMENT_SPEC = dict(
 capabilities=dict(type='dict', options=dict(
-    dps_power_management=dict(type='bool'),
     flow=dict(type='bool'),
     image_based_operating_system=dict(type='bool'),
     native_networking=dict(type='bool'),

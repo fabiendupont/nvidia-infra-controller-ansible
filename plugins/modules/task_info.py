@@ -21,22 +21,10 @@ author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  active_only:
-    type: bool
-    description:
-    - Restrict results to non-terminal Tasks.
   id:
     type: str
     description:
     - ID of the resource to retrieve.
-  include_report:
-    type: bool
-    description:
-    - Include the per-task execution report on each returned Task.
-  site_id:
-    type: str
-    description:
-    - ID of the Site whose Tasks are returned.
 '''
 
 EXAMPLES = r'''
@@ -74,17 +62,14 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-active_only=dict(type='bool'),
 id=dict(type='str'),
-include_report=dict(type='bool'),
-site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/task/{id}/cancel',
     'resource_item_path': '/v2/org/{org}/nico/task/{id}',
     'id_param': 'id',
-    'filter_fields': ['site_id', 'active_only', 'include_report'],
+    'filter_fields': [],
 }
 
 
