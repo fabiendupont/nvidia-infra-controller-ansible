@@ -33,7 +33,7 @@ options:
   site_id:
     type: str
     description:
-    - ID of the Site to filter Expected Machines by
+    - ID of the Site to filter label values by
 '''
 
 EXAMPLES = r'''
@@ -80,7 +80,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/expected-machine/batch',
     'resource_item_path': '/v2/org/{org}/nico/expected-machine/{expectedMachineId}',
     'id_param': 'expectedMachineId',
-    'filter_fields': ['site_id'],
+    'filter_fields': ['site_id', 'site_id', 'site_id'],
 }
 
 

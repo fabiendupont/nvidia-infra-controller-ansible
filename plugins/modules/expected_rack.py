@@ -50,7 +50,7 @@ options:
   rack_profile_id:
     type: str
     description:
-    - Identifier of the Rack Profile this rack conforms to. Must be non-empty.
+    - Ignored compatibility field. Core derives the profile from the matching ExpectedRackGroup; omit this field.
   site_id:
     type: str
     description:

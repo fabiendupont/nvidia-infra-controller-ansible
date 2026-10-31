@@ -19,6 +19,10 @@ author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
+  machine_id:
+    type: str
+    description:
+    - Only return endpoints whose exploration report has this Machine ID. Omit to return all endpoints in the Site.
   site_id:
     type: str
     description:
@@ -60,6 +64,7 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
+machine_id=dict(type='str'),
 site_id=dict(type='str'),
 )
 
@@ -67,7 +72,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/site-explorer/endpoint/action',
     'resource_item_path': '',
     'id_param': 'id',
-    'filter_fields': ['site_id'],
+    'filter_fields': ['site_id', 'machine_id'],
 }
 
 

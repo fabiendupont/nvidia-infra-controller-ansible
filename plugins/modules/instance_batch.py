@@ -93,9 +93,11 @@ options:
     type: list
     description:
     - 'Interface configuration shared across all instances. At least one interface must be specified unless `autoNetwork`
-      is true. Either Subnet or VPC Prefix interfaces allowed, only one of the Subnets or VPC Prefixes can be attached over
-      Physical interface. Interface `ipAddress` is not supported for batch instance creation requests. Mutually exclusive
-      with `autoNetwork`: when `autoNetwork` is true this list MUST be empty.'
+      is true. Interfaces must all be Subnet-backed or all be VPC-backed; VPC-backed interfaces may use an explicit `vpcPrefixId`
+      or ask the Controller to select a prefix using `vpcId` and `ipFamilies`. Each batch member is resolved independently
+      and may use a different prefix. Only one network can be attached over a physical interface. Interface `ipAddress` is
+      not supported for batch instance creation requests. Mutually exclusive with `autoNetwork`: when `autoNetwork` is true
+      this list MUST be empty.'
     elements: dict
     suboptions:
       device:
@@ -114,6 +116,11 @@ options:
         type: str
         description:
         - ip_address parameter.
+      ip_families:
+        type: list
+        description:
+        - ip_families parameter.
+        elements: str
       is_physical:
         type: bool
         description:
@@ -126,6 +133,10 @@ options:
         type: int
         description:
         - virtual_function_id parameter.
+      vpc_id:
+        type: str
+        description:
+        - vpc_id parameter.
       vpc_prefix_id:
         type: str
         description:
@@ -138,6 +149,19 @@ options:
     type: dict
     description:
     - Key-value objects to be applied to all instances (shared across all instances)
+  machine_label_selector:
+    type: dict
+    description:
+    - 'Optional exact-match selector applied to Machine labels during placement. Property names are arbitrary Machine label
+      keys rather than predefined selector fields. Every supplied key/value pair must match (AND semantics). An omitted or
+      empty object does not restrict placement. The selector constrains placement only; it is not persisted on the created
+      Instances.
+
+
+      A non-empty object requires the Tenant to have effective `targetedInstanceCreation` capability for the selected Site;
+      otherwise the request is rejected with 403. Selection occurs before topology optimization. When `topologyOptimized`
+      is true, all selected Machines must both match the selector and belong to the same NVLink domain. If too few matching
+      Machines are available, the request is rejected with 409.'
   name_prefix:
     type: str
     description:
@@ -172,13 +196,61 @@ options:
     type: bool
     description:
     - When set to true, the Instances will be enabled with the Phone Home service.
+  power_profile:
+    type: str
+    description:
+    - Power profile to apply to every Instance in the batch. A non-empty value requires the Site's `dpsPowerManagement` capability
+      to be `true`.
   secondary_vpc_ids:
     type: list
     description:
     - IDs of additional VPCs the Instances should attach to through non-primary interfaces. This field may only be specified
-      when every entry in `interfaces` uses `vpcPrefixId`. IDs must be unique, must be valid UUIDs, and must not include the
-      primary `vpcId`.
+      when every entry in `interfaces` uses `vpcPrefixId` or `vpcId`. IDs must be unique, must be valid UUIDs, and must not
+      include the primary `vpcId`.
     elements: str
+  spectrum_x_attachments:
+    type: list
+    description:
+    - SpectrumX Partition attachments shared across all Instances in the batch. Each `device` and `deviceInstance` pair may
+      appear only once, irrespective of `virtualFunctionId`.
+    elements: dict
+    suboptions:
+      attachment_type:
+        type: str
+        description:
+        - attachment_type parameter.
+        required: true
+        choices:
+        - Physical
+        - Virtual
+        - OVS
+      bridge_name:
+        type: str
+        description:
+        - bridge_name parameter.
+      device:
+        type: str
+        description:
+        - device parameter.
+        required: true
+      device_instance:
+        type: int
+        description:
+        - device_instance parameter.
+        required: true
+      ovn_network_name:
+        type: str
+        description:
+        - ovn_network_name parameter.
+      spectrum_x_partition_id:
+        type: str
+        description:
+        - spectrum_x_partition_id parameter.
+        required: true
+      virtual_function_id:
+        type: int
+        description:
+        - virtual_function_id parameter.
   ssh_key_group_ids:
     type: list
     description:
@@ -197,7 +269,11 @@ options:
   user_data:
     type: str
     description:
-    - User data applied to all instances. Can only be specified if allowOverride is set to true in Operating System
+    - User data applied to all instances. Can only be specified if allowOverride is set to true in Operating System. Limited
+      to 32768 bytes (32 KiB), measured on the effective value NICo stores rather than the text submitted. Operating System
+      defaults are inherited first, and when phone-home is configured the document is re-serialized with a `phone_home` block
+      added. Re-serialization normalizes indentation and can grow the document, so a request just under the limit may still
+      be rejected.
   vpc_id:
     type: str
     description:
@@ -251,13 +327,16 @@ interfaces=dict(type='list', elements='dict', options=dict(
     device_instance=dict(type='int'),
     inline_routing_profile=dict(type='str'),
     ip_address=dict(type='str'),
+    ip_families=dict(type='list', elements='str'),
     is_physical=dict(type='bool'),
     subnet_id=dict(type='str'),
     virtual_function_id=dict(type='int'),
+    vpc_id=dict(type='str'),
     vpc_prefix_id=dict(type='str'),
 )),
 ipxe_script=dict(type='str'),
 labels=dict(type='dict'),
+machine_label_selector=dict(type='dict'),
 name_prefix=dict(type='str', required=True),
 network_security_group_id=dict(type='str'),
 nv_link_interfaces=dict(type='list', elements='dict', options=dict(
@@ -266,7 +345,17 @@ nv_link_interfaces=dict(type='list', elements='dict', options=dict(
 )),
 operating_system_id=dict(type='str'),
 phone_home_enabled=dict(type='bool'),
+power_profile=dict(type='str'),
 secondary_vpc_ids=dict(type='list', elements='str'),
+spectrum_x_attachments=dict(type='list', elements='dict', options=dict(
+    attachment_type=dict(type='str', required=True, choices=['Physical', 'Virtual', 'OVS']),
+    bridge_name=dict(type='str'),
+    device=dict(type='str', required=True),
+    device_instance=dict(type='int', required=True),
+    ovn_network_name=dict(type='str'),
+    spectrum_x_partition_id=dict(type='str', required=True),
+    virtual_function_id=dict(type='int'),
+)),
 ssh_key_group_ids=dict(type='list', elements='str'),
 tenant_id=dict(type='str', required=True),
 topology_optimized=dict(type='bool'),
@@ -276,7 +365,7 @@ vpc_id=dict(type='str', required=True),
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/instance/batch',
-    'create_schema_fields': ['name_prefix', 'count', 'description', 'tenant_id', 'instance_type_id', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'auto_network', 'infiniband_interfaces', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'topology_optimized'],
+    'create_schema_fields': ['name_prefix', 'count', 'description', 'tenant_id', 'instance_type_id', 'machine_label_selector', 'vpc_id', 'secondary_vpc_ids', 'user_data', 'operating_system_id', 'power_profile', 'network_security_group_id', 'ipxe_script', 'always_boot_with_custom_ipxe', 'phone_home_enabled', 'labels', 'interfaces', 'auto_network', 'infiniband_interfaces', 'spectrum_x_attachments', 'dpu_extension_service_deployments', 'nv_link_interfaces', 'ssh_key_group_ids', 'topology_optimized'],
 }
 
 

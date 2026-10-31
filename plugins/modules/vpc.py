@@ -22,47 +22,58 @@ options:
   description:
     type: str
     description:
-    - Optional description for the VPC
+    - Updated description of the VPC
+  expected_inactive_vni:
+    type: int
+    description:
+    - Exact retained VNI observed with `ifVersionMatch`. It must match the VPC's inactive allocation and differ from its active
+      VNI.
   id:
     type: str
     description:
     - ID of the resource. Used for lookup.
+  if_version_match:
+    type: str
+    description:
+    - Exact Core VPC version from routing-state inspection used for the release decision, in `V<counter>-T<microseconds>`
+      format. Missing or malformed versions are rejected. A stale version returns 412; after an ambiguous release, that error
+      does not prove whether the previous release committed.
   labels:
     type: dict
     description:
-    - String key-value pairs describing VPC labels. Up to 10 key-value pairs can be specified
+    - Update labels of the VPC. Up to 10 key-value pairs can be specified. The labels will be replaced with the labels sent
+      in the request. Any labels not included in the request will be removed. To retain existing labels, fetch them first
+      and include them in this request.
   name:
     type: str
     description:
-    - Name of the VPC
+    - Updated name of the VPC
   network_security_group_id:
     type: str
     description:
     - ID of the Network Security Group to attach to the VPC
-  network_virtualization_type:
-    type: str
-    description:
-    - Network virtualization type of the VPC. If no value is specified, then defaults to `FNN` if Site has native networking
-      enabled, or `ETHERNET_VIRTUALIZER` if native networking is disabled. Flat VPCs hold instances on zero-DPU hosts (or
-      hosts with their DPU in NIC mode) and are never auto-selected -- `FLAT` must be specified explicitly.
-    choices:
-    - ETHERNET_VIRTUALIZER
-    - FNN
-    - FLAT
   nv_link_logical_partition_id:
     type: str
     description:
-    - ID of the default NVLink Logical Partition that GPUs for all Instances in the VPC will attach to
-  routing_profile:
+    - ID of the default NVLink Logical Partition that GPUs for all Instances in the VPC will attach to. Can only be updated
+      if VPC currently has no active Instances
+  power_resource_group:
     type: str
     description:
-    - Specify routing profile for the VPC. Only supported when `networkVirtualizationType` is set to `FNN`, or when `networkVirtualizationType`
-      is omitted and Site has Native Networking enabled. Requires Tenant to have elevated privilege. Current accepted values
-      are `privileged-internal`, `internal`, and `external`.
+    - Power resource group to associate with the VPC. A non-empty value requires the Site's `dpsPowerManagement` capability
+      to be `true`. Omission or `null` preserves the current association; an empty string clears it when DPS power management
+      is disabled.
+  routing_profile_overrides:
+    type: str
+    description:
+    - Replaces the current inline routing-profile definition when present. Requires `TargetedInstanceCreation` to be effective
+      for the Tenant at the VPC's Site. Omission or `null` preserves the current definition. An empty object restores inheritance
+      for every property; a partial object replaces the previous definition and inherits its omitted properties from the named
+      profile.
   site_id:
     type: str
     description:
-    - ID of the Site where the VPC should be created
+    - 'Scope filter: site_id.'
   state:
     type: str
     description:
@@ -70,10 +81,6 @@ options:
     choices:
     - present
     - absent
-  vni:
-    type: int
-    description:
-    - Explicitly requested VNI for the VPC
   vpc_id:
     type: str
     description:
@@ -122,16 +129,17 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 ARGUMENT_SPEC = dict(
 description=dict(type='str'),
+expected_inactive_vni=dict(type='int'),
 id=dict(type='str'),
+if_version_match=dict(type='str'),
 labels=dict(type='dict'),
 name=dict(type='str'),
 network_security_group_id=dict(type='str'),
-network_virtualization_type=dict(type='str', choices=['ETHERNET_VIRTUALIZER', 'FNN', 'FLAT']),
 nv_link_logical_partition_id=dict(type='str'),
-routing_profile=dict(type='str'),
+power_resource_group=dict(type='str'),
+routing_profile_overrides=dict(type='str'),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
-vni=dict(type='int'),
 vpc_id=dict(type='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
@@ -142,8 +150,8 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/vpc/{vpcId}',
     'id_param': 'vpcId',
     'name_field': 'name',
-    'create_schema_fields': ['id', 'name', 'description', 'site_id', 'network_virtualization_type', 'routing_profile', 'network_security_group_id', 'vni', 'nv_link_logical_partition_id', 'labels'],
-    'update_schema_fields': ['name', 'description', 'network_security_group_id', 'nv_link_logical_partition_id', 'labels'],
+    'create_schema_fields': ['if_version_match', 'expected_inactive_vni'],
+    'update_schema_fields': ['name', 'description', 'network_security_group_id', 'nv_link_logical_partition_id', 'routing_profile_overrides', 'power_resource_group', 'labels'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],

@@ -13,8 +13,8 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.dpu_extension_service
 short_description: Manage DPU Extension Service resources
 description:
-- DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only
-  supported service type.
+- DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through
+  the DPU agent; DpfHelmChart is reconciled through DPF.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:
@@ -23,7 +23,7 @@ options:
   credentials:
     type: dict
     description:
-    - Credentials to download resources specified in DPU Extension Service data
+    - Credentials to download resources specified in DPU Extension Service data; unsupported for DpfHelmChart
     suboptions:
       password:
         type: str
@@ -40,7 +40,13 @@ options:
   data:
     type: str
     description:
-    - Deployment spec for the DPU Extension Service
+    - 'Deployment specification as a string, limited to 131072 UTF-8 bytes.
+
+      Use a YAML/JSON Pod manifest for KubernetesPod or JSON-encoded Helm
+
+      configuration for DpfHelmChart. The object schema documents the Helm
+
+      structure; requests must still send a string.'
   description:
     type: str
     description:
@@ -49,6 +55,14 @@ options:
     type: str
     description:
     - 'ID path parameter: dpu_extension_service_id.'
+  dpu_target:
+    type: str
+    description:
+    - Required for DpfHelmChart services and unsupported for KubernetesPod services
+    choices:
+    - Primary
+    - AllActive
+    - All
   id:
     type: str
     description:
@@ -60,7 +74,7 @@ options:
   observability:
     type: dict
     description:
-    - Observability configuration for the DPU Extension Service version
+    - Observability configuration for the DPU Extension Service version; unsupported for DpfHelmChart
     suboptions:
       configs:
         type: list
@@ -73,6 +87,7 @@ options:
     - Type of the DPU Extension Service
     choices:
     - KubernetesPod
+    - DpfHelmChart
   site_id:
     type: str
     description:
@@ -139,6 +154,7 @@ credentials=dict(type='dict', options=dict(
 data=dict(type='str'),
 description=dict(type='str'),
 dpu_extension_service_id=dict(type='str'),
+dpu_target=dict(type='str', choices=['Primary', 'AllActive', 'All']),
 id=dict(type='str'),
 name=dict(type='str'),
 observability=dict(type='dict', options=dict(
@@ -153,7 +169,7 @@ observability=dict(type='dict', options=dict(
         )),
     )),
 )),
-service_type=dict(type='str', choices=['KubernetesPod']),
+service_type=dict(type='str', choices=['KubernetesPod', 'DpfHelmChart']),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
 version=dict(type='str'),
@@ -166,7 +182,7 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/dpu-extension-service/{dpuExtensionServiceId}/version/{version}',
     'id_param': 'version',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'service_type', 'site_id', 'data', 'credentials', 'observability'],
+    'create_schema_fields': ['name', 'description', 'service_type', 'dpu_target', 'site_id', 'data', 'credentials', 'observability'],
     'update_schema_fields': ['name', 'description', 'data', 'credentials', 'observability'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],

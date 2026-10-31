@@ -27,16 +27,24 @@ options:
   ip_block_id:
     type: str
     description:
-    - ID of the IP Block to allocate the VPC Prefix from
+    - ID of the Ready tenant IPv4 or IPv6 IP Block to allocate the VPC Prefix from. The block must be at the FNN VPC's Site.
   name:
     type: str
     description:
     - Human readable name for the VPC Prefix
+  prefix:
+    type: str
+    description:
+    - Exact network-aligned IPv4 or IPv6 CIDR to reserve. Accepted IPv6 text is canonicalized before persistence and response.
+      IPv4 accepts `/8` through `/31`. IPv6 accepts `/8` through `/63` when the FNN VPC has `slaacEnabled=true`, or `/8` through
+      `/126` otherwise. The CIDR must be contained by the selected IP Block, match its address family, and not overlap an
+      existing reservation. An IPv4-mapped IPv6 CIDR is not accepted. Mutually exclusive with `prefixLength`.
   prefix_length:
     type: int
     description:
-    - Prefix length for the VPC Prefix. Valid range is 8 to 31, and max usable value depends on prefix length of parent IP
-      Block.
+    - Prefix length for automatic allocation. IPv4 accepts 8 through 31. IPv6 accepts 8 through 63 when the FNN VPC has `slaacEnabled=true`,
+      or 8 through 126 otherwise. The selected IP Block must contain a prefix of the requested length. Mutually exclusive
+      with `prefix`.
   site_id:
     type: str
     description:
@@ -102,6 +110,7 @@ ARGUMENT_SPEC = dict(
 id=dict(type='str'),
 ip_block_id=dict(type='str'),
 name=dict(type='str'),
+prefix=dict(type='str'),
 prefix_length=dict(type='int'),
 site_id=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
@@ -116,7 +125,7 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/vpc-prefix/{vpcPrefixId}',
     'id_param': 'vpcPrefixId',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'vpc_id', 'ip_block_id', 'prefix_length'],
+    'create_schema_fields': ['name', 'vpc_id', 'ip_block_id', 'prefix', 'prefix_length'],
     'update_schema_fields': ['name'],
     'scope_fields': ['vpc_id', 'site_id'],
     'ready_statuses': ['Ready'],
