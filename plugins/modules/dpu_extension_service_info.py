@@ -13,8 +13,8 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.dpu_extension_service_info
 short_description: Retrieve DPU Extension Service information
 description:
-- DPU Extension Service allows users to run custom services in the DPUs of their Instances. KubernetesPod is delivered through
-  the DPU agent; DpfHelmChart is reconciled through DPF.
+- DPU Extension Service allows users to run custom services in the DPUs of their Instances. Currently K8s pods are the only
+  supported service type.
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:

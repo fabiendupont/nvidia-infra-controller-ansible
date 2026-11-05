@@ -19,19 +19,16 @@ author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  authentication_data:
-    type: dict
-    description:
-    - 'Optional, write-only authentication data for firmware downloads.
-
-      Not supported for DPU-only updates or by the legacy NICo compute
-
-      firmware controller.'
   filter:
     type: dict
     description:
     - Filter that selects Trays targeted for firmware update
     suboptions:
+      component_ids:
+        type: list
+        description:
+        - component_ids parameter.
+        elements: str
       ids:
         type: list
         description:
@@ -71,18 +68,6 @@ options:
       ready by their persisted status. Intended for operator-supervised
 
       maintenance.'
-  override_version_check:
-    type: bool
-    description:
-    - 'When true, request that the selected component backend override
-
-      firmware version-based checks when deciding whether to apply the
-
-      update. This permits same-version reapplication and downgrade when
-
-      supported. It does not bypass readiness checks or state-controller
-
-      routing.'
   rule_id:
     type: str
     description:
@@ -100,39 +85,19 @@ options:
       \ the tray\n(BMC, BIOS, etc.). The accepted set per tray type comes from\nthe Flow service's NICo proto bindings (which\
       \ mirror Core's\nper-tray-type enums in `NICo-core/crates/rpc/proto/forge.proto`),\nso the supported values track Core\
       \ as new sub-parts are added:\n  - switch trays (NvSwitchComponent): currently bmc, cpld, bios, nvos\n  - powershelf\
-      \ trays (PowerShelfComponent): currently pmc, psu\n  - compute trays (ComputeTrayComponent): currently bmc, bios\n\n\
-      The default `nico` compute component manager forwards BMC and BIOS\nselections through `UpdateComponentFirmware`. The\
-      \ opt-in\n`nicolegacy` manager schedules the whole configured host firmware\nbundle; it does not honor BMC or BIOS sub-target\
-      \ selection.\nOmitted or empty means \"update everything in the bundle\"\n(the historical default) for compute-tray-internal\
-      \ targets.\nUnknown names are rejected.\nThe special target `dpu`, valid only on compute trays,\nrequests DPU reprovisioning\
-      \ on the matched host. Unlike\nthe other targets, `dpu` is NOT covered by the\n\"omitted/empty means everything\" default\
-      \ \u2014 it must be\nlisted explicitly. `version` is ignored on the `dpu`\nbranch; the target firmware version comes\
-      \ from site\nconfiguration."
+      \ trays (PowerShelfComponent): currently pmc, psu\n  - compute trays (ComputeTrayComponent): currently bmc, bios\n \
+      \   (currently NOT honored end-to-end: the NICo compute-firmware\n    path goes through SetFirmwareUpdateTimeWindow\
+      \ + auto-update,\n    which has no per-target selection; the request is logged\n    and the whole bundle is applied.\
+      \ Will be honored once\n    compute moves to UpdateComponentFirmware.)\nOmitted or empty means \"update everything in\
+      \ the bundle\"\n(the historical default) for compute-tray-internal targets.\nUnknown names are rejected. Requires `version`\
+      \ to be set.\nThe special target `dpu`, valid only on compute trays,\nrequests DPU reprovisioning on the matched host.\
+      \ Unlike\nthe other targets, `dpu` is NOT covered by the\n\"omitted/empty means everything\" default \u2014 it must\
+      \ be\nlisted explicitly. `version` is ignored on the `dpu`\nbranch; the target firmware version comes from site\nconfiguration."
     elements: str
   version:
     type: str
     description:
-    - 'Firmware input serialized as a string: either one shared value for
-
-      all selected trays or a JSON mapping from tray type (`compute`,
-
-      `nvswitch`, `powershelf`) to firmware input.
-
-      These exact lowercase top-level keys are reserved for per-tray
-
-      mappings; a shared JSON object must not contain any of them.
-
-      A missing tray type in the mapping skips that component type.
-
-      A non-empty, non-layered value is forwarded unchanged.
-
-      For rack-scale RMS components, an omitted, null, empty, or
-
-      whitespace-only value uses the owning rack profile''s configured
-
-      firmware object. Resolution or fetch failures are reported by the
-
-      asynchronous task.'
+    - Target firmware version.
 '''
 
 EXAMPLES = r'''
@@ -165,8 +130,8 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-authentication_data=dict(type='dict'),
 filter=dict(type='dict', options=dict(
+    component_ids=dict(type='list', elements='str'),
     ids=dict(type='list', elements='str'),
     rack_id=dict(type='str'),
     rack_name=dict(type='str'),
@@ -175,7 +140,6 @@ filter=dict(type='dict', options=dict(
 )),
 id=dict(type='str'),
 override_readiness_check=dict(type='bool'),
-override_version_check=dict(type='bool'),
 rule_id=dict(type='str'),
 site_id=dict(type='str'),
 targets=dict(type='list', elements='str'),
@@ -186,7 +150,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/carbide/tray/firmware',
     'resource_item_path': '/v2/org/{org}/carbide/tray/{id}/firmware',
     'method': 'PATCH',
-    'body_fields': ['site_id', 'version', 'targets', 'authentication_data', 'rule_id', 'override_version_check', 'override_readiness_check', 'filter'],
+    'body_fields': ['site_id', 'version', 'targets', 'rule_id', 'override_readiness_check', 'filter'],
     'query_fields': [],
 }
 

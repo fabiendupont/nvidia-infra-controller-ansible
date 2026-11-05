@@ -20,21 +20,11 @@ author: Fabien Dupont
 extends_documentation_fragment:
 - nvidia.infra_controller.auth
 options:
-  allowed_tests:
-    type: list
-    description:
-    - Validation test names allowed for this run.
-    elements: str
   clear_instance_type:
     type: bool
     description:
     - Set to true to clear the existing Instance Type. Cannot be specified if Instance Type ID is specified. Can only be set
       by Provider.
-  contexts:
-    type: list
-    description:
-    - Contexts used to select validation tests.
-    elements: str
   health_issue:
     type: dict
     description:
@@ -102,19 +92,11 @@ options:
         type: dict
         description:
         - policy parameter.
-  run_unverified_tests:
-    type: bool
-    description:
-    - Whether unverified validation tests may run.
   set_maintenance_mode:
     type: bool
     description:
     - Set to `true` to enable maintenance mode and to `false` to disable maintenance mode. Can be set by Provider or privileged
       Tenant.
-  source:
-    type: str
-    description:
-    - 'ID path parameter: source.'
   state:
     type: str
     description:
@@ -122,11 +104,6 @@ options:
     choices:
     - present
     - absent
-  tags:
-    type: list
-    description:
-    - Tags used to select validation tests.
-    elements: str
   wait:
     type: bool
     description:
@@ -162,9 +139,7 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 
 ARGUMENT_SPEC = dict(
-allowed_tests=dict(type='list', elements='str'),
 clear_instance_type=dict(type='bool'),
-contexts=dict(type='list', elements='str'),
 health_issue=dict(type='dict', options=dict(
     category=dict(type='str', required=True, choices=['Hardware', 'Network', 'Performance', 'Storage', 'Software', 'Other']),
     details=dict(type='str', required=True),
@@ -186,21 +161,18 @@ online_repair=dict(type='dict', options=dict(
         allow_auto_instance_deletion_on_failure=dict(type='bool', required=True),
     )),
 )),
-run_unverified_tests=dict(type='bool'),
 set_maintenance_mode=dict(type='bool'),
-source=dict(type='str'),
 state=dict(type='str', choices=['present', 'absent']),
-tags=dict(type='list', elements='str'),
 wait=dict(type='bool'),
 wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/machine-capability',
-    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}/health-report/{source}',
-    'id_param': 'source',
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}',
+    'id_param': 'machineId',
     'name_field': None,
-    'create_schema_fields': ['tags', 'allowed_tests', 'run_unverified_tests', 'contexts'],
+    'create_schema_fields': [],
     'update_schema_fields': ['instance_type_id', 'clear_instance_type', 'set_maintenance_mode', 'maintenance_message', 'labels', 'online_repair', 'health_issue'],
     'scope_fields': [],
     'ready_statuses': ['Ready'],

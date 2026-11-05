@@ -23,10 +23,15 @@ options:
     type: bool
     description:
     - Restrict results to non-terminal Tasks.
+  component_id:
+    type: str
+    description:
+    - Filter by external component ID (requires type; mutually exclusive with rackId/rackName; use repeated params for multiple
+      values)
   id:
     type: str
     description:
-    - Filter by component ID (mutually exclusive with rackId/rackName; use repeated params for multiple values)
+    - Filter by tray UUID. Can be specified multiple times to filter on more than one tray ID.
   include_report:
     type: bool
     description:
@@ -42,7 +47,7 @@ options:
   rack_id:
     type: str
     description:
-    - Scope to a specific Rack by Rack ID (mutually exclusive with rackName)
+    - Scope to a specific Rack by ID (mutually exclusive with rackName)
   rack_name:
     type: str
     description:
@@ -56,14 +61,10 @@ options:
     description:
     - Restrict validation to trays at this rack slot (matches `position.slotId`). Requires `rackId` or `rackName`. Composes
       with the rest of the filter via AND.
-  source:
-    type: str
-    description:
-    - 'ID path parameter: source.'
   type:
     type: str
     description:
-    - Tray type used to select the corresponding component health-report resource
+    - Filter trays by type
     choices:
     - Compute
     - NVSwitch
@@ -106,6 +107,7 @@ from ansible_collections.nvidia.infra_controller.plugins.module_utils.resource i
 
 ARGUMENT_SPEC = dict(
 active_only=dict(type='bool'),
+component_id=dict(type='str'),
 id=dict(type='str'),
 include_report=dict(type='bool'),
 manufacturer=dict(type='str'),
@@ -114,15 +116,14 @@ rack_id=dict(type='str'),
 rack_name=dict(type='str'),
 site_id=dict(type='str'),
 slot_id=dict(type='int'),
-source=dict(type='str'),
 type=dict(type='str', choices=['Compute', 'NVSwitch', 'PowerShelf']),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/tray/{id}/task',
-    'resource_item_path': '/v2/org/{org}/nico/tray/{id}/health-report/{source}',
-    'id_param': 'source',
-    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'id', 'slot_id', 'site_id', 'rack_id', 'rack_name', 'name', 'manufacturer', 'type', 'id', 'slot_id', 'site_id', 'type', 'site_id', 'site_id', 'active_only', 'include_report'],
+    'resource_item_path': '/v2/org/{org}/nico/tray/{id}',
+    'id_param': 'id',
+    'filter_fields': ['site_id', 'rack_id', 'rack_name', 'type', 'component_id', 'id', 'slot_id', 'site_id', 'rack_id', 'rack_name', 'name', 'manufacturer', 'type', 'component_id', 'slot_id', 'site_id', 'site_id', 'active_only', 'include_report'],
 }
 
 

@@ -58,33 +58,21 @@ options:
     description:
     - 'Power control state to apply:
 
-      - `On`: Power on the target(s)
+      - `on`: Power on the target(s)
 
-      - `Off`: Graceful power off
+      - `off`: Graceful power off
 
-      - `Cycle`: Graceful power cycle (restart)
+      - `cycle`: Graceful power cycle (restart)
 
-      - `ForceOff`: Forced power off (immediate)
+      - `forceoff`: Forced power off (immediate)
 
-      - `ForceCycle`: Forced power cycle (immediate restart)
-
-      - `ACPowerCycle`: Remove and restore AC power (unsupported on Viking systems)
-
-
-      Exact lowercase forms are also accepted for compatibility.'
+      - `forcecycle`: Forced power cycle (immediate restart)'
     choices:
-    - 'On'
-    - 'Off'
-    - Cycle
-    - ForceOff
-    - ForceCycle
-    - ACPowerCycle
     - 'on'
     - 'off'
     - cycle
     - forceoff
     - forcecycle
-    - acpowercycle
 '''
 
 EXAMPLES = r'''
@@ -124,7 +112,7 @@ id=dict(type='str'),
 override_readiness_check=dict(type='bool'),
 rule_id=dict(type='str'),
 site_id=dict(type='str'),
-state=dict(type='str', choices=['On', 'Off', 'Cycle', 'ForceOff', 'ForceCycle', 'ACPowerCycle', 'on', 'off', 'cycle', 'forceoff', 'forcecycle', 'acpowercycle']),
+state=dict(type='str', choices=['on', 'off', 'cycle', 'forceoff', 'forcecycle']),
 )
 
 RESOURCE_CONFIG = {

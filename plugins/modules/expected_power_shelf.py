@@ -163,7 +163,7 @@ wait_timeout=dict(type='int'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/expected-power-shelf/all',
+    'resource_path': '/v2/org/{org}/nico/expected-power-shelf',
     'resource_item_path': '/v2/org/{org}/nico/expected-power-shelf/{expectedPowerShelfId}',
     'id_param': 'expectedPowerShelfId',
     'name_field': 'name',

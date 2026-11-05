@@ -89,10 +89,6 @@ options:
     type: str
     description:
     - Filter Capabilities by Machines from a particular Site
-  source:
-    type: str
-    description:
-    - 'ID path parameter: source.'
   status:
     type: str
     description:
@@ -164,7 +160,6 @@ machine_id=dict(type='str'),
 name=dict(type='str'),
 query=dict(type='str'),
 site_id=dict(type='str'),
-source=dict(type='str'),
 status=dict(type='str'),
 tenant_id=dict(type='str'),
 type=dict(type='str'),
@@ -173,9 +168,9 @@ vendor=dict(type='str'),
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/machine-capability',
-    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}/health-report/{source}',
-    'id_param': 'source',
-    'filter_fields': ['site_id', 'id', 'has_instance_type', 'instance_type_id', 'tenant_id', 'has_instance', 'is_missing_on_site', 'include_metadata', 'status', 'capability_type', 'capability_name', 'hw_sku_device_type', 'query', 'site_id', 'site_id', 'site_id', 'site_id', 'site_id', 'site_id', 'has_instance_type', 'type', 'name', 'frequency', 'capacity', 'vendor', 'inactive_devices', 'count'],
+    'resource_item_path': '/v2/org/{org}/nico/machine/{machineId}',
+    'id_param': 'machineId',
+    'filter_fields': ['site_id', 'id', 'has_instance_type', 'instance_type_id', 'tenant_id', 'has_instance', 'is_missing_on_site', 'include_metadata', 'status', 'capability_type', 'capability_name', 'hw_sku_device_type', 'query', 'site_id', 'site_id', 'site_id', 'site_id', 'has_instance_type', 'type', 'name', 'frequency', 'capacity', 'vendor', 'inactive_devices', 'count'],
 }
 
 

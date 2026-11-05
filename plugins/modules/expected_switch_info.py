@@ -77,7 +77,7 @@ site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/expected-switch/all',
+    'resource_path': '/v2/org/{org}/nico/expected-switch',
     'resource_item_path': '/v2/org/{org}/nico/expected-switch/{expectedSwitchId}',
     'id_param': 'expectedSwitchId',
     'filter_fields': ['site_id'],
