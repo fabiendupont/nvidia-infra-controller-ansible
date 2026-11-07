@@ -77,7 +77,7 @@ site_id=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
-    'resource_path': '/v2/org/{org}/nico/expected-power-shelf',
+    'resource_path': '/v2/org/{org}/nico/expected-power-shelf/all',
     'resource_item_path': '/v2/org/{org}/nico/expected-power-shelf/{expectedPowerShelfId}',
     'id_param': 'expectedPowerShelfId',
     'filter_fields': ['site_id'],

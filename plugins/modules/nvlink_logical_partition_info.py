@@ -43,7 +43,8 @@ options:
   nv_link_domain_id:
     type: str
     description:
-    - Filter NVLink Interfaces by NVLink Domain ID.  Can be specified multiple times to filter on more than one ID.
+    - Filter NVLink Interfaces by Core-reported NVLink domain UUID, not the rack group ID returned by the Domain API. Can
+      be specified multiple times to filter on more than one UUID.
   nv_link_logical_partition_id:
     type: str
     description:

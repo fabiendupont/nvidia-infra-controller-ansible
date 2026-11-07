@@ -47,6 +47,10 @@ options:
     type: str
     description:
     - ID of the Site that owns the Rack.
+  source:
+    type: str
+    description:
+    - 'ID path parameter: source.'
 '''
 
 EXAMPLES = r'''
@@ -91,13 +95,14 @@ include_report=dict(type='bool'),
 manufacturer=dict(type='str'),
 name=dict(type='str'),
 site_id=dict(type='str'),
+source=dict(type='str'),
 )
 
 RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/rack/{id}/task',
-    'resource_item_path': '/v2/org/{org}/nico/rack/{id}',
-    'id_param': 'id',
-    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer', 'site_id', 'name', 'manufacturer', 'site_id', 'site_id', 'active_only', 'include_report'],
+    'resource_item_path': '/v2/org/{org}/nico/rack/{id}/health-report/{source}',
+    'id_param': 'source',
+    'filter_fields': ['site_id', 'include_components', 'name', 'manufacturer', 'site_id', 'name', 'manufacturer', 'site_id', 'site_id', 'site_id', 'active_only', 'include_report'],
 }
 
 

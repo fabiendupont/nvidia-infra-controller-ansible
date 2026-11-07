@@ -31,11 +31,7 @@ options:
   ipv4_block_id:
     type: str
     description:
-    - ID of the derived Tenant IPv4 Block from an Allocation
-  ipv6_block_id:
-    type: str
-    description:
-    - ID of the derived Tenant IPv6 Block from an Allocation
+    - ID of the Ready, derived Tenant IPv4 Block from an Allocation
   name:
     type: str
     description:
@@ -43,7 +39,7 @@ options:
   prefix_length:
     type: int
     description:
-    - Length of the prefix
+    - Length of the IPv4 prefix, from 8 through 30
   site_id:
     type: str
     description:
@@ -62,7 +58,7 @@ options:
   vpc_id:
     type: str
     description:
-    - ID of the VPC containing the Subnet
+    - ID of the Ethernet virtualizer VPC containing the Subnet
   wait:
     type: bool
     description:
@@ -109,7 +105,6 @@ ARGUMENT_SPEC = dict(
 description=dict(type='str'),
 id=dict(type='str'),
 ipv4_block_id=dict(type='str'),
-ipv6_block_id=dict(type='str'),
 name=dict(type='str'),
 prefix_length=dict(type='int'),
 site_id=dict(type='str'),
@@ -125,7 +120,7 @@ RESOURCE_CONFIG = {
     'resource_item_path': '/v2/org/{org}/nico/subnet/{subnetId}',
     'id_param': 'subnetId',
     'name_field': 'name',
-    'create_schema_fields': ['name', 'description', 'vpc_id', 'ipv4_block_id', 'ipv6_block_id', 'prefix_length'],
+    'create_schema_fields': ['name', 'description', 'vpc_id', 'ipv4_block_id', 'prefix_length'],
     'update_schema_fields': ['name', 'description'],
     'scope_fields': ['vpc_id', 'site_id'],
     'ready_statuses': ['Ready'],

@@ -13,8 +13,7 @@ DOCUMENTATION = r'''
 module: nvidia.infra_controller.machine_capability_info
 short_description: Retrieve Machine Capability information
 description:
-- Machine Capability defines the hardware capabilities of a Machine. Machine Capabilities can be used to group Machines into
-  Instance Types.
+- Machine Capability operations
 version_added: 1.0.0
 author: Fabien Dupont
 extends_documentation_fragment:

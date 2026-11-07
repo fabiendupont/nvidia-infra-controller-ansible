@@ -67,7 +67,7 @@ RESOURCE_CONFIG = {
     'resource_path': '/v2/org/{org}/nico/tenant/instance-type/stats',
     'resource_item_path': '',
     'id_param': 'id',
-    'filter_fields': ['site_id'],
+    'filter_fields': ['site_id', 'site_id'],
 }
 
 

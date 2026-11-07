@@ -25,11 +25,13 @@ options:
   bmc_ip_address:
     type: str
     description:
-    - Optional BMC IP address (IPv4 or IPv6). When set, pre-allocates a reserved IP for the BMC.
+    - Optional BMC IP address (IPv4 or IPv6). A non-empty address sets the value and pre-allocates a reserved IP for the BMC.
+      An empty string clears the value. Omission or null preserves the current value.
   bmc_mac_address:
     type: str
     description:
-    - MAC address of the Expected Machine's BMC (Baseboard Management Controller)
+    - The Expected Machine's BMC MAC address is immutable after creation. Omit this field, or provide another case/separator
+      spelling of the current MAC as a compatibility no-op.
   chassis_serial_number:
     type: str
     description:
@@ -37,11 +39,13 @@ options:
   default_bmc_password:
     type: str
     description:
-    - Password for accessing the Expected Machine's BMC
+    - Password for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied
+      without defaultBmcUsername.
   default_bmc_username:
     type: str
     description:
-    - Username for accessing the Expected Machine's BMC
+    - Username for accessing the Expected Machine's BMC. Omission or null preserves the value. A non-empty value can be supplied
+      without defaultBmcPassword.
   description:
     type: str
     description:
@@ -72,10 +76,76 @@ options:
     type: str
     description:
     - ID of the resource. Used for lookup.
+  interfaces:
+    type: list
+    description:
+    - Complete expected host NIC list. Omission or null preserves the current list; an explicit empty list clears it.
+    elements: dict
+    suboptions:
+      fixed_gateway:
+        type: str
+        description:
+        - fixed_gateway parameter.
+      fixed_ip:
+        type: str
+        description:
+        - fixed_ip parameter.
+      fixed_mask:
+        type: str
+        description:
+        - fixed_mask parameter.
+      ip_allocation:
+        type: str
+        description:
+        - ip_allocation parameter.
+        choices:
+        - Unspecified
+        - Dynamic
+        - Fixed
+        - Retained
+        - null
+      mac_address:
+        type: str
+        description:
+        - mac_address parameter.
+        required: true
+      network_segment_type:
+        type: str
+        description:
+        - network_segment_type parameter.
+        choices:
+        - Tenant
+        - Admin
+        - Underlay
+        - HostInband
+        - null
+      nic_type:
+        type: str
+        description:
+        - nic_type parameter.
+      primary:
+        type: bool
+        description:
+        - primary parameter.
+      role:
+        type: str
+        description:
+        - role parameter.
+        choices:
+        - Unspecified
+        - Host
+        - DpuOs
+        - DpuBmc
+        - HostBmc
+        - null
   is_dpf_enabled:
     type: bool
     description:
-    - When true, this host is eligible for DPF-based provisioning.
+    - 'When true, this host is eligible for DPF-based provisioning.
+
+      Optional. Omission or null leaves the existing setting unchanged.
+
+      An explicit true or false value updates the setting.'
   labels:
     type: dict
     description:
@@ -175,6 +245,17 @@ host_lifecycle_profile=dict(type='dict', options=dict(
     disable_lockdown=dict(type='bool'),
 )),
 id=dict(type='str'),
+interfaces=dict(type='list', elements='dict', options=dict(
+    fixed_gateway=dict(type='str'),
+    fixed_ip=dict(type='str'),
+    fixed_mask=dict(type='str'),
+    ip_allocation=dict(type='str', choices=['Unspecified', 'Dynamic', 'Fixed', 'Retained', None]),
+    mac_address=dict(type='str', required=True),
+    network_segment_type=dict(type='str', choices=['Tenant', 'Admin', 'Underlay', 'HostInband', None]),
+    nic_type=dict(type='str'),
+    primary=dict(type='bool'),
+    role=dict(type='str', choices=['Unspecified', 'Host', 'DpuOs', 'DpuBmc', 'HostBmc', None]),
+)),
 is_dpf_enabled=dict(type='bool'),
 labels=dict(type='dict'),
 manufacturer=dict(type='str'),
@@ -196,7 +277,7 @@ RESOURCE_CONFIG = {
     'id_param': 'expectedMachineId',
     'name_field': 'name',
     'create_schema_fields': [],
-    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'sku_id', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'is_dpf_enabled', 'labels', 'host_lifecycle_profile'],
+    'update_schema_fields': ['id', 'bmc_mac_address', 'default_bmc_username', 'default_bmc_password', 'chassis_serial_number', 'fallback_dpu_serial_numbers', 'interfaces', 'sku_id', 'rack_id', 'bmc_ip_address', 'name', 'manufacturer', 'model', 'description', 'slot_id', 'tray_idx', 'host_id', 'is_dpf_enabled', 'labels', 'host_lifecycle_profile'],
     'scope_fields': ['site_id'],
     'ready_statuses': ['Ready'],
     'error_statuses': ['Error'],
